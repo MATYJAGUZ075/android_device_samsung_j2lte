@@ -99,21 +99,16 @@ PRODUCT_PACKAGES += \
 # TODO(fase 5): bloque RIL completo pendiente de re-trabajo. En T desapareció
 # TARGET_PROCESS_SDK_VERSION_OVERRIDE; el modelo objetivo es el del porte
 # Exynos7420: radio@1.2-1.4 + config + TARGET_USES_VND_SECRIL contra el blob
-# libsec-ril.so (tss310). Se conservan los paquetes base como punto de partida.
+# libsec-ril.so (tss310).
+# C-1 (22/08): bloque Q neutralizado para el primer build.
+# android.hardware.radio.deprecated@1.0 fue eliminado de AOSP en R y puede no
+# existir como modulo en LOS 20 -> riesgo "missing module".
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-full \
-    libsecril-client \
     modemloader \
-    libxml2 \
-    rild \
-    libril \
-    libreference-ril \
-    libsecril-client-sap \
-    android.hardware.radio@1.1 \
-    android.hardware.radio.deprecated@1.0
+    libxml2
 
-PRODUCT_COPY_FILES += \
-    device/samsung/universal3475-common/configs/init/rild.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/rild.legacy.rc
+# PRODUCT_COPY_FILES rild.rc se restaura en fase 5 junto al nuevo bloque RIL.
 
 # Vendor security patch level (vendor blobs from G550FYXXU1CRF1)
 # Declarado via VENDOR_SECURITY_PATCH en BoardConfig.mk.
