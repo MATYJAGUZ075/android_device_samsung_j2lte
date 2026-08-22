@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 The LineageOS Project
+# Copyright (C) 2018-2026 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,27 @@
 
 LOCAL_PATH := device/samsung/j2lte
 
-$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
+# Device overlay (static). TODO(fase 3+): migrar overlays compatibles a
+# rro_overlays/ siguiendo el patrón de los portes Exynos legacy en LOS 20.
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 
 # Audio
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/audio/mixer_paths.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths_0.xml \
     $(LOCAL_PATH)/configs/audio/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml
 
+# Stack HIDL audio estilo LOS20 (referencia: universal7420-common).
+# TODO(fase 4): audio.primary.universal3475 debe compilar contra la HAL 7.x
+# de hardware/samsung/audio; audio_policy_configuration.xml requiere regen a
+# version 7.0 (actualmente sigue siendo 1.0/3.0 del árbol 17.1).
 PRODUCT_PACKAGES += \
     audio.primary.universal3475 \
-    audio.a2dp.default \
     audio.r_submix.default \
     audio.usb.default \
     tinymix \
-    android.hardware.audio@2.0-impl \
-    android.hardware.audio.effect@2.0-impl
+    android.hardware.audio.service \
+    android.hardware.audio@7.1-impl:32 \
+    android.hardware.audio.effect@7.0-impl:32
 
 # Boot animation
 TARGET_BOOTANIMATION_PRELOAD := true
@@ -42,13 +48,18 @@ TARGET_SCREEN_WIDTH := 540
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
+# HAL BT HIDL 1.0 custom (impl vive en universal3475-common/hardware/bluetooth).
+# Enfoque validado por el porte Exynos7420 en LOS 20/21 (HIDL 1.0 sigue vivo).
 PRODUCT_PACKAGES += \
     android.hardware.bluetooth@1.0-service
 
 # Camera
+# Wrapper legacy (CameraWrapper.cpp en common) contra camera.provider HIDL.
+# TODO(fase 3): evaluar subida de provider 2.4 -> 2.5 (instancia legacy/0,
+# como hace universal7420-common).
+# TODO: app de cámara — Snap fue eliminada en T; evaluar Aperture de Lineage.
 PRODUCT_PACKAGES += \
-    camera.universal3475 \
-    Snap
+    camera.universal3475
 
 # Graphics
 # Device uses high-density artwork where available
@@ -57,16 +68,14 @@ PRODUCT_AAPT_PREF_CONFIG := hdpi
 # A list of dpis to select prebuilt apk, in precedence order.
 PRODUCT_AAPT_PREBUILT_DPI := hdpi xhdpi mdpi
 
-# HIDL Manifest
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/manifest.xml:$(TARGET_COPY_OUT_VENDOR)/manifest.xml
-
 # Keylayouts
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio_keys.kl:system/usr/keylayout/gpio_keys.kl \
     $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl
 
 # Touch features
+# TODO(fase 4): verificar que hardware/samsung lineage-20 sigue ofreciendo
+# vendor.lineage.touch@1.0-service.samsung.
 PRODUCT_PACKAGES += \
     vendor.lineage.touch@1.0-service.samsung
 
@@ -87,6 +96,10 @@ PRODUCT_PACKAGES += \
     init.target.rc
 
 # Radio
+# TODO(fase 5): bloque RIL completo pendiente de re-trabajo. En T desapareció
+# TARGET_PROCESS_SDK_VERSION_OVERRIDE; el modelo objetivo es el del porte
+# Exynos7420: radio@1.2-1.4 + config + TARGET_USES_VND_SECRIL contra el blob
+# libsec-ril.so (tss310). Se conservan los paquetes base como punto de partida.
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-full \
     libsecril-client \
@@ -102,22 +115,15 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     device/samsung/universal3475-common/configs/init/rild.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/rild.legacy.rc
 
-# Overlays
-DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
-
 # Vendor security patch level (vendor blobs from G550FYXXU1CRF1)
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.lineage.build.vendor_security_patch=2018-04-01
+# Declarado via VENDOR_SECURITY_PATCH en BoardConfig.mk.
 
-# Wi-fi
+# Wi-Fi
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/wifi/cred.conf:system/etc/wifi/cred.conf \
     $(LOCAL_PATH)/configs/wifi/wpa_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/wpa_supplicant_overlay.conf \
     $(LOCAL_PATH)/configs/wifi/p2p_supplicant_overlay.conf:$(TARGET_COPY_OUT_VENDOR)/etc/wifi/p2p_supplicant_overlay.conf \
     $(LOCAL_PATH)/configs/wifi/filter_ie:system/etc/wifi/filter_ie
-
-# Properties
--include $(LOCAL_PATH)/system_prop.mk
 
 # Inherit from universal3475-common
 $(call inherit-product, device/samsung/universal3475-common/device-common.mk)

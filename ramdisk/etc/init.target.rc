@@ -1,3 +1,7 @@
+# init.target.rc — específico de j2lte
+# TODO(fase 3/4): revisar escrituras directas a /dev/cpuset/* (en T se usan
+# cgroups.json/task_profiles.json) y los writes de /proc/sys/vm al completar
+# el porte del kernel. Contenido 17.1 conservado intencionalmente en Fase 0.
 on boot
     # Update cpusets now that processors are up
     write /dev/cpuset/foreground/cpus 0-3

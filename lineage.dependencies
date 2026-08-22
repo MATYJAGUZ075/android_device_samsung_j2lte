@@ -2,5 +2,39 @@
     {
         "repository": "android_device_samsung_universal3475-common",
         "target_path": "device/samsung/universal3475-common"
+    },
+    {
+        "repository": "android_hardware_samsung",
+        "target_path": "hardware/samsung",
+        "revision": "lineage-20"
+    },
+    {
+        "repository": "android_hardware_samsung_slsi_exynos",
+        "target_path": "hardware/samsung_slsi/exynos",
+        "revision": "lineage-19.1",
+        "optional": true
+    },
+    {
+        "repository": "android_hardware_samsung_slsi_exynos5",
+        "target_path": "hardware/samsung_slsi/exynos5",
+        "revision": "lineage-19.1",
+        "optional": true
+    },
+    {
+        "repository": "android_hardware_samsung_slsi_exynos3475",
+        "target_path": "hardware/samsung_slsi/exynos3475",
+        "revision": "lineage-17.1",
+        "optional": true
+    },
+    {
+        "repository": "android_hardware_samsung_slsi_openmax",
+        "target_path": "hardware/samsung_slsi/openmax",
+        "revision": "lineage-19.1",
+        "optional": true
+    },
+    {
+        "repository": "android_kernel_samsung_exynos3475",
+        "target_path": "kernel/samsung/exynos3475",
+        "optional": false
     }
 ]

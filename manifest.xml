@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Comments, Legal notices, etc. here -->
-<manifest version="1.0" type="device">
+<!-- Manifest VINTF del device para LineageOS 20 (Android 13).
+     Estrategia del porte (referencia: universal7420 en LOS 20):
+     - target-level="3" (FCM de Android R) permite mantener HALs HIDL legacy.
+     - Cada HAL declarada corresponde a algo que el J2 puede proporcionar
+       vía código propio, hardware/samsung o blobs existentes.
+     - Las entradas marcadas TODO se ajustan en fases posteriores.
+     Se instala via DEVICE_MANIFEST_FILE (ver BoardConfig.mk). -->
+<manifest version="1.0" type="device" target-level="3">
+    <!-- Audio: HIDL 7.x sobre audio.primary.universal3475 (passthrough 32-bit).
+         TODO(fase 4): requiere portar el primary HAL a la API 7.x. -->
     <hal format="hidl">
         <name>android.hardware.audio</name>
         <transport arch="32">passthrough</transport>
-        <version>2.0</version>
+        <version>7.1</version>
         <interface>
             <name>IDevicesFactory</name>
             <instance>default</instance>
@@ -13,12 +21,14 @@
     <hal format="hidl">
         <name>android.hardware.audio.effect</name>
         <transport arch="32">passthrough</transport>
-        <version>2.0</version>
+        <version>7.0</version>
         <interface>
             <name>IEffectsFactory</name>
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Bluetooth: HCI HIDL 1.0 custom (universal3475-common/hardware/bluetooth).
+         Enfoque validado por Exynos7420 en LOS 20/21. -->
     <hal format="hidl">
         <name>android.hardware.bluetooth</name>
         <transport>hwbinder</transport>
@@ -28,6 +38,8 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Camera: wrapper legacy contra provider 2.4.
+         TODO(fase 3): evaluar subida a 2.5 (instancia legacy/0). -->
     <hal format="hidl">
         <name>android.hardware.camera.provider</name>
         <transport>hwbinder</transport>
@@ -37,24 +49,7 @@
             <instance>legacy/0</instance>
         </interface>
     </hal>
-    <hal format="hidl">
-        <name>android.hardware.cas</name>
-        <transport>hwbinder</transport>
-        <version>1.0</version>
-        <interface>
-            <name>IMediaCasService</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="hidl">
-        <name>android.hardware.configstore</name>
-        <transport>hwbinder</transport>
-        <version>1.1</version>
-        <interface>
-            <name>ISurfaceFlingerConfigs</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+    <!-- DRM: framework + clearkey software; Widevine L3 vía blobs. -->
     <hal format="hidl">
         <name>android.hardware.drm</name>
         <transport>hwbinder</transport>
@@ -68,6 +63,7 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- GNSS: gpsd blob + wrapper 1.0 (universal3475-common). -->
     <hal format="hidl">
         <name>android.hardware.gnss</name>
         <transport arch="32">passthrough</transport>
@@ -77,6 +73,8 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Graphics: stack SLSI exynos5 legacy con adapters HWC1->HWC2.
+         TODO(fase 2): validar compilación y runtime de composer/allocator. -->
     <hal format="hidl">
         <name>android.hardware.graphics.allocator</name>
         <transport>hwbinder</transport>
@@ -104,16 +102,19 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Health 2.1 (requisito mínimo práctico en T). -->
     <hal format="hidl">
         <name>android.hardware.health</name>
         <transport>hwbinder</transport>
-        <version>2.0</version>
+        <version>2.1</version>
         <interface>
             <name>IHealth</name>
             <instance>backup</instance>
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Keymaster 3.0 + TEE mobicore (enfoque Exynos7420 en LOS 20).
+         Plan B documentado en ANALISIS_LINEAGE20_REFERENCIAS.md: soft KM 4. -->
     <hal format="hidl">
         <name>android.hardware.keymaster</name>
         <transport>hwbinder</transport>
@@ -123,6 +124,7 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Lights: android.hardware.light@2.0-service.samsung (hardware/samsung). -->
     <hal format="hidl">
         <name>android.hardware.light</name>
         <transport>hwbinder</transport>
@@ -132,6 +134,8 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Media OMX: codecs SLSI Samsung (openmax) — enfoque mantenido por
+         universal7420 en LOS 20. TODO(fase 4): evaluar Codec2. -->
     <hal format="hidl">
         <name>android.hardware.media.omx</name>
         <transport>hwbinder</transport>
@@ -154,6 +158,8 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Power: HAL samsung exynos. TODO(fase 4): decidir entre power@1.0
+         legacy y power-service.samsung-libperfmgr + powerhint.json. -->
     <hal format="hidl">
         <name>android.hardware.power</name>
         <transport>hwbinder</transport>
@@ -163,19 +169,13 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <hal format="hidl">
-        <name>vendor.lineage.power</name>
-        <transport>hwbinder</transport>
-        <version>1.0</version>
-        <interface>
-            <name>ILineagePower</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+    <!-- Radio: rild legacy + libsec-ril (tss310).
+         TODO(fase 5): re-trabajo completo hacia radio@1.2-1.4 estilo 7420;
+         radio.deprecated@1.0 se elimina cuando eso ocurra. -->
     <hal format="hidl">
         <name>android.hardware.radio</name>
         <transport>hwbinder</transport>
-        <version>1.0</version>
+        <version>1.1</version>
         <interface>
             <name>IRadio</name>
             <instance>slot1</instance>
@@ -185,20 +185,8 @@
             <instance>slot1</instance>
         </interface>
     </hal>
-    <hal format="hidl">
-        <name>android.hardware.radio.deprecated</name>
-        <transport>hwbinder</transport>
-        <version>1.0</version>
-        <interface>
-            <name>IOemHook</name>
-            <instance>slot1</instance>
-        </interface>
-    </hal>
-    <hal format="hidl">
-        <name>android.hardware.renderscript</name>
-        <transport arch="32">passthrough</transport>
-        <version>1.0</version>
-    </hal>
+    <!-- Sensors: blob sensors.universal7580.so vía passthrough 1.0.
+         TODO(fase 4): wrapper multihal si hace falta. -->
     <hal format="hidl">
         <name>android.hardware.sensors</name>
         <transport arch="32">passthrough</transport>
@@ -208,6 +196,7 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- USB básico. -->
     <hal format="hidl">
         <name>android.hardware.usb</name>
         <transport>hwbinder</transport>
@@ -217,6 +206,7 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Vibrator. -->
     <hal format="hidl">
         <name>android.hardware.vibrator</name>
         <transport>hwbinder</transport>
@@ -226,6 +216,8 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Wi-Fi: bcmdhd + wpa_supplicant VER_0_8_X con WPA_SUPPLICANT_USE_HIDL
+         (receta validada en LOS 20 por universal7420). -->
     <hal format="hidl">
         <name>android.hardware.wifi.hostapd</name>
         <transport>hwbinder</transport>
@@ -244,6 +236,9 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- HALs Lineage específicas del dispositivo. -->
+    <!-- Touch: key disabler / gestures. TODO: verificar disponibilidad en
+         hardware/samsung lineage-20 (fase 4). -->
     <hal format="hidl">
         <name>vendor.lineage.touch</name>
         <transport>hwbinder</transport>
@@ -257,6 +252,8 @@
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- Trust HAL. TODO: vendor.lineage.trust fue retirado del árbol Lineage
+         en versiones recientes; eliminar esta entrada si no se mantiene. -->
     <hal format="hidl">
         <name>vendor.lineage.trust</name>
         <transport>hwbinder</transport>
@@ -266,4 +263,11 @@
             <instance>default</instance>
         </interface>
     </hal>
+
+    <!-- ELIMINADAS respecto al manifest 17.1 (muertas en A13 o sin implementación planificada):
+         - android.hardware.cas               (sin uso)
+         - android.hardware.configstore       (eliminado en A12; usar disable_configstore)
+         - android.hardware.radio.deprecated  (se elimina en fase 5)
+         - android.hardware.renderscript      (deprecado/eliminado en T)
+         - vendor.lineage.power               (reemplazado por power HAL moderna) -->
 </manifest>

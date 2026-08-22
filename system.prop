@@ -1,0 +1,27 @@
+# System properties específicas de j2lte (formato LOS20: system.prop,
+# consumido via TARGET_SYSTEM_PROP en BoardConfig.mk).
+
+# Dalvik/Art (1.5GB RAM, 32-bit)
+dalvik.vm.heapstartsize=8m
+dalvik.vm.heapgrowthlimit=128m
+dalvik.vm.heapsize=512m
+dalvik.vm.heaptargetutilization=0.75
+dalvik.vm.heapminfree=2m
+dalvik.vm.heapmaxfree=8m
+
+# Radio (blob libsec-ril.so / módem tss310)
+telephony.lteOnCdmaDevice=0
+persist.radio.sib16_support=0
+rild.libpath=/system/lib/libsec-ril.so
+rild.libargs=-d /dev/ttyS0
+ro.telephony.default_network=9
+ro.use_data_netmgrd=false
+persist.data.netmgrd.qos.enable=false
+ro.smps.enable=true
+# TODO(fase 5): props legacy del RIL — verificar cuáles sigue leyendo la capa
+# RIL de Lineage 20; eliminar las que queden huérfanas.
+ro.ril.telephony.mqanelements=6
+ro.telephony.get_imsi_from_sim=true
+ro.ril.force_eri_from_xml=true
+ro.ril.hsxpa=1
+ro.ril.gprsclass=10

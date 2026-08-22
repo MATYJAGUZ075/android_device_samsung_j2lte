@@ -1,5 +1,6 @@
 /*
    Copyright (c) 2016, The CyanogenMod Project. All rights reserved.
+   Copyright (c) 2017-2020, The LineageOS Project. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
@@ -16,26 +17,28 @@
 
    THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
    WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
-   ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-   BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-   BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-   OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NON-INFRINGEMENT ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT
+   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
+
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <sys/_system_properties.h>
 
 #include <android-base/file.h>
 #include <android-base/logging.h>
-#include <android-base/strings.h>
 #include <android-base/properties.h>
+#include <android-base/strings.h>
 
 #include "property_service.h"
 #include "vendor_init.h"
@@ -44,15 +47,26 @@ using android::base::GetProperty;
 using android::base::ReadFileToString;
 using android::base::Trim;
 
-void property_override(char const prop[], char const value[])
-{
-    prop_info *pi;
+// Orden de fuentes de ro.product.* (copiado de build/tools/releasetools,
+// igual que en los portes legacy a LOS 20).
+std::vector<std::string> ro_product_props_default_source_order = {
+    "",
+    "odm.",
+    "vendor.",
+    "system.",
+    "system_ext.",
+    "product.",
+};
 
-    pi = (prop_info*) __system_property_find(prop);
-    if (pi)
+void property_override(char const prop[], char const value[], bool add = true)
+{
+    auto pi = (prop_info *) __system_property_find(prop);
+
+    if (pi != nullptr) {
         __system_property_update(pi, value, strlen(value));
-    else
+    } else if (add) {
         __system_property_add(prop, strlen(prop), value, strlen(value));
+    }
 }
 
 void property_override_dual(char const system_prop[],
@@ -66,7 +80,7 @@ void set_sim_info()
 {
     const char *simslot_count_path = "/proc/simslot_count";
     std::string simslot_count;
-    
+
     if (ReadFileToString(simslot_count_path, &simslot_count)) {
         simslot_count = Trim(simslot_count); // strip newline
         property_override("ro.multisim.simslotcount", simslot_count.c_str());
@@ -74,9 +88,8 @@ void set_sim_info()
             property_override("rild.libpath2", "/system/lib/libsec-ril-dsds.so");
             property_override("persist.radio.multisim.config", "dsds");
         }
-    }
-    else {
-        LOG(ERROR) << "Could not open '" << simslot_count_path << "'\n";
+    } else {
+        LOG(ERROR) << "Could not open '" << simslot_count_path << "'";
     }
 }
 
@@ -85,6 +98,8 @@ void vendor_load_properties()
     std::string bootloader = GetProperty("ro.bootloader", "");
     std::string device;
 
+    // Detectar variante por bootloader: SM-J200F/G/GU/M/BT/Y.
+    // El fingerprint de stock se mantiene en LMY47X (5.1.1).
     if (bootloader.find("J200F") != std::string::npos) {
         /* SM-J200F */
         property_override_dual("ro.product.model", "ro.vendor.product.model", "SM-J200F");
@@ -104,16 +119,20 @@ void vendor_load_properties()
         /* SM-J200Y */
         property_override_dual("ro.product.model", "ro.vendor.product.model", "SM-J200Y");
     } else {
-        /* Forcing SM-J200F */
-        property_override_dual("ro.product.model", "ro.vendor.product.model", "SM-J200F");
+        /* Fallback: SM-J200M (variante objetivo de este porte) */
+        property_override_dual("ro.product.model", "ro.vendor.product.model", "SM-J200M");
     }
 
-    property_override_dual("ro.build.fingerprint", "ro.vendor.build.fingerprint", "samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys");
-    property_override("ro.system.build.fingerprint", "samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys");
-    property_override("ro.build.description", "j2ltejv-user 5.1.1 LMY47X J200FXXS3ARI1 release-keys");
+    property_override_dual("ro.build.fingerprint", "ro.vendor.build.fingerprint",
+            "samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys");
+    property_override("ro.system.build.fingerprint",
+            "samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys");
+    property_override("ro.build.description",
+            "j2ltejv-user 5.1.1 LMY47X J200FXXS3ARI1 release-keys");
 
     set_sim_info();
 
     device = GetProperty("ro.product.device", "");
-    LOG(ERROR) << "Found bootloader id '" << bootloader.c_str() << "' setting build properties for '" << device.c_str() << "' device\n";
+    LOG(ERROR) << "Found bootloader id '" << bootloader
+               << "' setting build properties for '" << device << "' device";
 }

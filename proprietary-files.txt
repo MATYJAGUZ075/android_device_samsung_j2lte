@@ -1,10 +1,13 @@
-# all unpinned blobs come from SM-A310F stock (A310FXXS5CTK2)
+# ORIGEN DE BLOBS [FASE 0 - INVESTIGAR]:
+# Los blobs no pineados provienen de SM-A310F stock (A310FXXS5CTK2), NO del
+# stock propio del J200x. Verificar disponibilidad de equivalentes del stock
+# J200FXXS3ARI1 durante las fases 4-6. Marcados con [not-J200-origin].
 
 # Bluetooth firmware
 vendor/firmware/bcm43438A1_V0067.0280.hcd
 
 # Camera
-lib/hw/camera.universal7580.so:lib/hw/camera.vendor.universal7580.so
+lib/hw/camera.universal7580.so:lib/hw/camera.vendor.universal7580.so # [not-J200-origin]
 lib/libexynoscamera.so
 vendor/firmware/setfile_3l2.bin
 vendor/firmware/setfile_5e3.bin
@@ -48,7 +51,7 @@ lib/libsec-ril.so
 lib/libsec-ril-dsds.so
 
 # Sensors
-lib/hw/sensors.universal7580.so
+lib/hw/sensors.universal7580.so # [not-J200-origin]
 lib/libsensorservice.so
 vendor/lib/libyasalgo.so
 vendor/etc/yas_set.cfg
@@ -63,7 +66,7 @@ vendor/firmware/ram_patch.fw
 
 # NFC
 etc/sec_s3fwrn5s_rfreg.bin
-lib/hw/nfc_nci.universal7580.so
+lib/hw/nfc_nci.universal7580.so # [not-J200-origin]
 vendor/firmware/sec_s3fwrn5s_firmware.bin
 
 # cbd, from boot.img and pinned to stop removal when extracting from system image
