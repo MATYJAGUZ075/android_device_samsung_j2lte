@@ -216,26 +216,10 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- Wi-Fi: bcmdhd + wpa_supplicant VER_0_8_X con WPA_SUPPLICANT_USE_HIDL
-         (receta validada en LOS 20 por universal7420). -->
-    <hal format="hidl">
-        <name>android.hardware.wifi.hostapd</name>
-        <transport>hwbinder</transport>
-        <version>1.1</version>
-        <interface>
-            <name>IHostapd</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="hidl">
-        <name>android.hardware.wifi.supplicant</name>
-        <transport>hwbinder</transport>
-        <version>1.2</version>
-        <interface>
-            <name>ISupplicant</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+    <!-- Wi-Fi (FIX-017): en LOS20 hostapd/supplicant son AIDL y quedan
+         declarados por external/wpa_supplicant_8 vía LOCAL_VINTF_FRAGMENTS
+         (android.hardware.wifi.{hostapd,supplicant}, fqname default).
+         No declarar aquí las versiones HIDL sin implementación. -->
     <!-- HALs Lineage específicas del dispositivo. -->
     <!-- Touch: key disabler / gestures. TODO: verificar disponibilidad en
          hardware/samsung lineage-20 (fase 4). -->
