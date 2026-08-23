@@ -220,23 +220,11 @@
          declarados por external/wpa_supplicant_8 vía LOCAL_VINTF_FRAGMENTS
          (android.hardware.wifi.{hostapd,supplicant}, fqname default).
          No declarar aquí las versiones HIDL sin implementación. -->
-    <!-- HALs Lineage específicas del dispositivo. -->
-    <!-- Touch: key disabler / gestures. TODO: verificar disponibilidad en
-         hardware/samsung lineage-20 (fase 4). -->
-    <hal format="hidl">
-        <name>vendor.lineage.touch</name>
-        <transport>hwbinder</transport>
-        <version>1.0</version>
-        <interface>
-            <name>IKeyDisabler</name>
-            <instance>default</instance>
-        </interface>
-        <interface>
-            <name>ITouchscreenGesture</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <!-- Trust HAL. TODO: vendor.lineage.trust fue retirado del árbol Lineage
+        <!-- HALs Lineage específicas del dispositivo. -->
+    <!-- Touch — FIX-026: bloque retirado TEMPORALMENTE; ver device-common.mk.
+         (vendor.lineage.touch@1.0-service.samsung no es emitido por Soong;
+         investigación N2 pendiente.) -->
+<!-- Trust HAL. TODO: vendor.lineage.trust fue retirado del árbol Lineage
          en versiones recientes; eliminar esta entrada si no se mantiene. -->
     <hal format="hidl">
         <name>vendor.lineage.trust</name>

@@ -73,11 +73,10 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/keylayout/gpio_keys.kl:system/usr/keylayout/gpio_keys.kl \
     $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl
 
-# Touch features
-# TODO(fase 4): verificar que hardware/samsung lineage-20 sigue ofreciendo
-# vendor.lineage.touch@1.0-service.samsung.
-PRODUCT_PACKAGES += \
-    vendor.lineage.touch@1.0-service.samsung
+# Touch features — FIX-026: entrada retirada TEMPORALMENTE. Soong analiza
+# hardware/samsung/hidl/touch/Android.bp (presente en .module_paths) pero NO
+# emite el módulo al late-mk (0 menciones vs 32 de composer, run 32665631574).
+# Causa raíz bajo investigación (N2). Revertir cuando se resuelva.
 
 # Permissions
 PRODUCT_COPY_FILES += \
