@@ -185,7 +185,7 @@
             <instance>slot1</instance>
         </interface>
     </hal>
-    <!-- Sensors: blob sensors.universal7580.so vía passthrough 1.0.
+    <!-- Sensors: blob sensors.universal3475.so vía passthrough 1.0.
          TODO(fase 4): wrapper multihal si hace falta. -->
     <hal format="hidl">
         <name>android.hardware.sensors</name>
