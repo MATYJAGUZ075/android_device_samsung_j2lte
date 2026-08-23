@@ -1,16 +1,31 @@
-# ORIGEN DE BLOBS [FASE 0 - INVESTIGAR]:
-# Los blobs no pineados provienen de SM-A310F stock (A310FXXS5CTK2), NO del
-# stock propio del J200x. Verificar disponibilidad de equivalentes del stock
-# J200FXXS3ARI1 durante las fases 4-6. Marcados con [not-J200-origin].
+# ORIGEN DE BLOBS [RECONCILIADO V-3, 2026-08-23]:
+# Base = inventario REAL de vendor_samsung/j2lte/proprietary (espejo verificado
+# de Exynos3475/android_vendor_samsung lineage-17.1 @12a1fb3).
+# Adicionales marcados [J2-cm14.1] verificados en el tree autentico
+# Exynos3475/android_device_samsung_j2lte cm-14.1 (stock J200).
+# Eliminadas entradas Exynos7580/A310/A510 y NFC (hardware inexistente en J200).
+# Las entradas PENDIENTE-DUMP estan comentadas: blobs exigidos/consumidos pero
+# sin fuente verificable hasta disponer de un dump stock del SM-J200M.
 
 # Bluetooth firmware
-vendor/firmware/bcm43438A1_V0067.0280.hcd
+vendor/firmware/bcm43438A1_V0055.0244.hcd
+# PENDIENTE-DUMP [J2-cm14.1] - solo inventario: NO re-agregar a
+# PRODUCT_PACKAGES (FIX-003). Tratamiento en fase Bluetooth.
+# vendor/lib/libbt-vendor.so
+
+# Audience earSmart DSP (audio)
+vendor/firmware/es305_fw.bin
+vendor/firmware/es305_fw_bypass.bin
 
 # Camera
-lib/hw/camera.universal7580.so:lib/hw/camera.vendor.universal7580.so # [not-J200-origin]
-lib/libexynoscamera.so
-vendor/firmware/setfile_3l2.bin
-vendor/firmware/setfile_5e3.bin
+lib/hw/camera.vendor.exynos5.so
+lib/libexynoscameraexternal.so
+vendor/firmware/fimc_is_lib_isp.bin
+# PENDIENTE-DUMP: exigidos por el kernel (fimc-is-binary.h:26/32,
+# fimc-is-device-ischain.c:808/3638, 4ec-soc.c:4168) pero SIN fuente
+# verificable en ningun tree Exynos3475 publico. NO inventar origen:
+# vendor/firmware/fimc_is_fw2.bin
+# vendor/firmware/setfile_4ec.bin
 
 # Media
 # S5P Multi Format Codec
@@ -18,13 +33,10 @@ vendor/firmware/mfc_fw.bin
 
 # Image subsystem
 vendor/firmware/fimc_is_fd.bin
-vendor/firmware/fimc_is_fw2_3l2.bin
 
 # Mobicore
-app/020a0000000000000000000000000000.drbin:vendor/app/020a0000000000000000000000000000.drbin
 app/FFFFFFFF000000000000000000000001.drbin:vendor/app/FFFFFFFF000000000000000000000001.drbin
 app/mcRegistry/00060308060501020000000000000000.tlbin:vendor/app/mcRegistry/00060308060501020000000000000000.tlbin
-app/mcRegistry/02010000080300030000000000000000.tlbin:vendor/app/mcRegistry/02010000080300030000000000000000.tlbin
 app/mcRegistry/07010000000000000000000000000000.tlbin:vendor/app/mcRegistry/07010000000000000000000000000000.tlbin
 app/mcRegistry/07060000000000000000000000000000.tlbin:vendor/app/mcRegistry/07060000000000000000000000000000.tlbin
 app/mcRegistry/08130000000000000000000000000000.tlbin:vendor/app/mcRegistry/08130000000000000000000000000000.tlbin
@@ -39,7 +51,6 @@ app/mcRegistry/ffffffff000000000000000000000013.tlbin:vendor/app/mcRegistry/ffff
 app/mcRegistry/ffffffff000000000000000000000016.tlbin:vendor/app/mcRegistry/ffffffff000000000000000000000016.tlbin
 app/mcRegistry/ffffffff000000000000000000000017.tlbin:vendor/app/mcRegistry/ffffffff000000000000000000000017.tlbin
 app/mcRegistry/ffffffff000000000000000000000019.tlbin:vendor/app/mcRegistry/ffffffff000000000000000000000019.tlbin
-app/mcRegistry/ffffffff000000000000000000000021.tlbin:vendor/app/mcRegistry/ffffffff000000000000000000000021.tlbin
 app/mcRegistry/ffffffff000000000000000000000041.tlbin:vendor/app/mcRegistry/ffffffff000000000000000000000041.tlbin
 app/mcRegistry/ffffffffd00000000000000000000004.tlbin:vendor/app/mcRegistry/ffffffffd00000000000000000000004.tlbin
 app/mcRegistry/ffffffffd0000000000000000000000a.tlbin:vendor/app/mcRegistry/ffffffffd0000000000000000000000a.tlbin
@@ -49,12 +60,12 @@ app/mcRegistry/fffffffff0000000000000000000001e.tlbin:vendor/app/mcRegistry/ffff
 # RIL
 lib/libsec-ril.so
 lib/libsec-ril-dsds.so
+lib/libcutils_symbol.so
+etc/plmn_se13.bin
+etc/plmn_delta.bin
 
 # Sensors
-lib/hw/sensors.universal7580.so # [not-J200-origin]
-lib/libsensorservice.so
-vendor/lib/libyasalgo.so
-vendor/etc/yas_set.cfg
+lib/hw/sensors.universal3475.so
 
 # Wifi
 etc/wifi/bcmdhd_apsta.bin:vendor/etc/wifi/bcmdhd_apsta.bin
@@ -62,12 +73,6 @@ etc/wifi/bcmdhd_mfg.bin:vendor/etc/wifi/bcmdhd_mfg.bin
 etc/wifi/bcmdhd_sta.bin:vendor/etc/wifi/bcmdhd_sta.bin
 etc/wifi/nvram_mfg.txt:vendor/etc/wifi/nvram_mfg.txt
 etc/wifi/nvram_net.txt:vendor/etc/wifi/nvram_net.txt
-vendor/firmware/ram_patch.fw
-
-# NFC
-etc/sec_s3fwrn5s_rfreg.bin
-lib/hw/nfc_nci.universal7580.so # [not-J200-origin]
-vendor/firmware/sec_s3fwrn5s_firmware.bin
 
 # cbd, from boot.img and pinned to stop removal when extracting from system image
 bin/cbd:vendor/bin/cbd|1b3ec965475829467a09e86a7103bc4086e66194
@@ -76,10 +81,9 @@ bin/cbd:vendor/bin/cbd|1b3ec965475829467a09e86a7103bc4086e66194
 bin/sswap:vendor/bin/sswap|1670863f292325de353373caa9b8d34e47276eee
 
 # Lifevibes audio enhancer
-vendor/lib/libLifevibes_lvverx.so:vendor/lib/soundfx/libLifevibes_lvverx.so
-vendor/lib/libLifevibes_lvvetx.so:vendor/lib/soundfx/libLifevibes_lvvetx.so
-vendor/etc/nxp/AzControlParams_SPEAKER.txt
-vendor/etc/nxp/LVAZFS_Configuration.txt
+# PENDIENTE-DUMP [J2-cm14.1] - consumidos por configs/audio/audio_effects.xml:9-10:
+# vendor/lib/libLifevibes_lvverx.so:vendor/lib/soundfx/libLifevibes_lvverx.so
+# vendor/lib/libLifevibes_lvvetx.so:vendor/lib/soundfx/libLifevibes_lvvetx.so
 vendor/etc/nxp/LVVEFS_Tx_Configuration.txt
 vendor/etc/nxp/LVVEFS_Rx_Configuration.txt
 vendor/etc/nxp/BargeIn/Tx_ControlParams_WIDEBAND_ANALOG_DOCK.txt
@@ -99,128 +103,76 @@ vendor/etc/nxp/mVoIP/Rx_ControlParams_NARROWBAND_EARPIECE.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_NARROWBAND_SPEAKER.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIP/Rx_ControlParams_NARROWBAND_SLD.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_WIDEBAND_EARPIECE.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/mVoIP/Rx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIP/Rx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_NARROWBAND_EARPIECE.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_NARROWBAND_SPEAKER.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIP/Tx_ControlParams_NARROWBAND_SLD.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_WIDEBAND_EARPIECE.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/mVoIP/Tx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIP/Tx_ControlParams_WIDEBAND_SLD.txt
-vendor/etc/nxp/mVoIPFMC/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
-vendor/etc/nxp/mVoIPFMC/Rx_ControlParams_WIDEBAND_EARPIECE.txt
-vendor/etc/nxp/mVoIPFMC/Rx_ControlParams_WIDEBAND_SPEAKER.txt
-vendor/etc/nxp/mVoIPFMC/Rx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
-vendor/etc/nxp/mVoIPFMC/Rx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIPFMC/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
-vendor/etc/nxp/mVoIPFMC/Tx_ControlParams_WIDEBAND_EARPIECE.txt
-vendor/etc/nxp/mVoIPFMC/Tx_ControlParams_WIDEBAND_SPEAKER.txt
-vendor/etc/nxp/mVoIPFMC/Tx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
-vendor/etc/nxp/mVoIPFMC/Tx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
 vendor/etc/nxp/mVoIPSec/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/mVoIPSec/Rx_ControlParams_WIDEBAND_EARPIECE.txt
 vendor/etc/nxp/mVoIPSec/Rx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/mVoIPSec/Rx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/mVoIPSec/Rx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIPSec/Rx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/mVoIPSec/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/mVoIPSec/Tx_ControlParams_WIDEBAND_EARPIECE.txt
 vendor/etc/nxp/mVoIPSec/Tx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/mVoIPSec/Tx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/mVoIPSec/Tx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/mVoIPSec/Tx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_EARPIECE.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_SPEAKER.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/VideoTelephony/Rx_ControlParams_NARROWBAND_SLD.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_EARPIECE.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/VideoTelephony/Rx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_EARPIECE.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_SPEAKER.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/VideoTelephony/Tx_ControlParams_NARROWBAND_SLD.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_EARPIECE.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/VideoTelephony/Tx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_SLD.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_SPEAKER.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/WifiCalling/Rx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_SLD.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_SPEAKER.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_SLD.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_SPEAKER.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
 vendor/etc/nxp/WifiCalling/Tx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_SLD.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_SPEAKER.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_SLD.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_SPEAKER.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
-vendor/etc/nxp/WifiCallingHAC/Rx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_SLD.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_SPEAKER.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_WIRED_HEADPHONE.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_NARROWBAND_WIRED_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_BLUETOOTH_SCO_HEADSET_NREC_ON.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_EARPIECE.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_SLD.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_SPEAKER.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_WIRED_HEADPHONE.txt
-vendor/etc/nxp/WifiCallingHAC/Tx_ControlParams_WIDEBAND_WIRED_HEADSET.txt
