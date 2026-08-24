@@ -68,7 +68,8 @@ TARGET_LD_SHIM_LIBS += \
 VENDOR_SECURITY_PATCH := 2018-04-01
 
 # System properties específicas del dispositivo
-TARGET_SYSTEM_PROP += $(LOCAL_PATH)/system.prop
+# FIX-032: ver BoardConfigCommon.mk
+TARGET_SYSTEM_PROP += device/samsung/j2lte/system.prop
 
 # NOTA (eliminado respecto a 17.1):
 #   TARGET_PROCESS_SDK_VERSION_OVERRIDE (/system/vendor/bin/hw/rild=27)
