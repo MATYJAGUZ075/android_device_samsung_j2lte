@@ -99,7 +99,6 @@ void vendor_load_properties()
     std::string device;
 
     // Detectar variante por bootloader: SM-J200F/G/GU/M/BT/Y.
-    // El fingerprint de stock se mantiene en LMY47X (5.1.1).
     if (bootloader.find("J200F") != std::string::npos) {
         /* SM-J200F */
         property_override_dual("ro.product.model", "ro.vendor.product.model", "SM-J200F");
@@ -123,12 +122,12 @@ void vendor_load_properties()
         property_override_dual("ro.product.model", "ro.vendor.product.model", "SM-J200M");
     }
 
-    property_override_dual("ro.build.fingerprint", "ro.vendor.build.fingerprint",
-            "samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys");
-    property_override("ro.system.build.fingerprint",
-            "samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys");
-    property_override("ro.build.description",
-            "j2ltejv-user 5.1.1 LMY47X J200FXXS3ARI1 release-keys");
+    // El fingerprint NO se sobreescribe aqui a proposito. Antes se fijaba al de
+    // stock (5.1.1) para conservar la identidad de stock, pero ART lo usa como
+    // clave de la base de datos de core platform API y un 5.1.1 no existe en
+    // A13. El fingerprint coherente lo define BUILD_FINGERPRINT en
+    // lineage_j2lte.mk. Este modulo de init solo selecciona el modelo de
+    // hardware por variante (J200F/G/GU/M/BT/Y).
 
     set_sim_info();
 

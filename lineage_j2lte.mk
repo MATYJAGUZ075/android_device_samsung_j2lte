@@ -36,10 +36,22 @@ PRODUCT_BRAND := samsung
 PRODUCT_MANUFACTURER := samsung
 PRODUCT_GMS_CLIENTID_BASE := android-samsung
 
-# NOTE: ro.product.model / fingerprint are overridden per hardware variant
-# (J200F/G/GU/M/BT/Y) at boot by libinit_j2lte (see init/init_j2lte.cpp).
+# NOTE: ro.product.model is overridden per hardware variant (J200F/G/GU/M/BT/Y)
+# at boot by libinit_j2lte (see init/init_j2lte.cpp).
+#
+# ro.build.fingerprint: antes se fijaba al de stock, samsung/j2ltejv/j2lte:5.1.1
+# (Android 5.1.1, 2014), solo para conservar la "identidad de stock". El problema
+# es que ART usa el fingerprint como clave para buscar la base de datos de core
+# platform API, y un 5.1.1 no puede existir en una base de datos de A13. Se
+# observa en el arranque que zygote muere justo despues de loguear
+#   I zygote: Core platform API reporting enabled, enforcing=false
+# que es justo la linea anterior a esa busqueda.
+#
+# El nivel de API de envio para VINTF/sepolicy no depende del fingerprint: lo
+# fija product_launched_with_l_mr1.mk, mas abajo. Asi que declarar un
+# fingerprint coherente con la API real (13) no cambia la compatibilidad VINTF.
 PRODUCT_BUILD_PROP_OVERRIDES += \
     PRODUCT_NAME=j2ltejv \
-    PRIVATE_BUILD_DESC="j2ltejv-user 5.1.1 LMY47X J200FXXS3ARI1 release-keys"
+    PRIVATE_BUILD_DESC="j2ltejv-user 13 TQ3A.230901.001 userdebug test-keys"
 
-BUILD_FINGERPRINT := samsung/j2ltejv/j2lte:5.1.1/LMY47X/J200FXXS3ARI1:user/release-keys
+BUILD_FINGERPRINT := lineage/j2lte/j2lte:13/TQ3A.230901.001/20260926:userdebug/test-keys
