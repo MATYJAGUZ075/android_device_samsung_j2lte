@@ -196,16 +196,26 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- USB básico. -->
+    <!-- Configstore 1.1 (FIX-034): declarado aquí porque el service
+         configstore@1.1-service se instala en vendor y sin esta entrada
+         su registerAsService() falla (crash-loop) una vez el VINTF global
+         deja de abortar por el conflicto de usb. -->
     <hal format="hidl">
-        <name>android.hardware.usb</name>
+        <name>android.hardware.configstore</name>
         <transport>hwbinder</transport>
-        <version>1.0</version>
+        <version>1.1</version>
         <interface>
-            <name>IUsb</name>
+            <name>ISurfaceFlingerConfigs</name>
             <instance>default</instance>
         </interface>
     </hal>
+    <!-- USB (FIX-034): NO se declara aquí. android.hardware.usb@1.0-service.basic
+         (device-common.mk) instala su propio VINTF fragment
+         (android.hardware.usb@1.0-service.basic.xml). Declararlo también en el
+         manifest device provoca el conflicto libvintf "Conflicting major version:
+         1.0 (manifest.xml) vs. 1.0 (fragment)" que aborta el ensamblado VINTF
+         combinado -> TODAS las HALs fallan con registerAsService()=-2147483648
+         (fallo raíz diagnosticado en el J2, limpio tras retirar el fragment). -->
     <!-- Vibrator. -->
     <hal format="hidl">
         <name>android.hardware.vibrator</name>
