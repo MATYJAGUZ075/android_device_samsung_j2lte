@@ -158,17 +158,14 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- Power: HAL samsung exynos. TODO(fase 4): decidir entre power@1.0
-         legacy y power-service.samsung-libperfmgr + powerhint.json. -->
-    <hal format="hidl">
-        <name>android.hardware.power</name>
-        <transport>hwbinder</transport>
-        <version>1.0</version>
-        <interface>
-            <name>IPower</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+    <!-- Power: NO se declara aqui. FIX-035: se declara el HIDL power@1.0 pero
+         no hay ningun HAL que lo implemente (power@1.0-service.exynos no existe
+         en LOS20), y PowerManagerService.nativeInit() se queda esperando el
+         servicio para siempre -> ANR -> bucle de reinicios. La implementacion
+         real es el AIDL android.hardware.power-service.samsung-libperfmgr, que
+         instala su propio fragment VINTF con override="true". Declarar el HIDL
+         ademas provocaria el conflicto de version mayor que se vio con USB. -->
+
     <!-- Radio: rild legacy + libsec-ril (tss310).
          TODO(fase 5): re-trabajo completo hacia radio@1.2-1.4 estilo 7420;
          radio.deprecated@1.0 se elimina cuando eso ocurra. -->
