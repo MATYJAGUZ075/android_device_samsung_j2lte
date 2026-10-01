@@ -124,16 +124,31 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- Lights: android.hardware.light@2.0-service.samsung (hardware/samsung). -->
-    <hal format="hidl">
-        <name>android.hardware.light</name>
-        <transport>hwbinder</transport>
-        <version>2.0</version>
-        <interface>
-            <name>ILight</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+    <!-- Lights: android.hardware.light@2.0-service.samsung (hardware/samsung).
+         FIX-024: ese servicio NO existe en hardware/samsung lineage-20 (no hay
+         dir lights), igual que paso con power@1.0 (FIX-035). Con el HAL
+         declarado y sin implementacion, LightsService.setLight_native() pide el
+         servicio, getRawServiceInternal() se queda en Waiter::wait(), el main
+         thread de system_server se bloquea y el watchdog reinicia el sistema en
+         bucle. Medido on-device: 4 dumps de "Blocked in handler on main thread"
+         con este stack exacto, y el sistema nunca llegaba a boot_completed.
+
+         Se desactiva la declaracion, igual que se hizo con power en FIX-035.
+         LightsService cae al path sin-HAL: arranca el boot. Se pierde el LED de
+         notificaciones y el brillo automatico (que ya no funcionaban porque el
+         sistema reiniciaba antes de llegar a usarlos).
+
+         Verificado en el dispositivo antes de aplicar: el manifest parsea como
+         XML valido y queda en 17 <hal> activos. -->
+    <!--FIX-LIGHT     <hal format="hidl"> -->
+    <!--FIX-LIGHT         <name>android.hardware.light</name> -->
+    <!--FIX-LIGHT         <transport>hwbinder</transport> -->
+    <!--FIX-LIGHT         <version>2.0</version> -->
+    <!--FIX-LIGHT         <interface> -->
+    <!--FIX-LIGHT             <name>ILight</name> -->
+    <!--FIX-LIGHT             <instance>default</instance> -->
+    <!--FIX-LIGHT         </interface> -->
+    <!--FIX-LIGHT     </hal> -->
     <!-- Media OMX: codecs SLSI Samsung (openmax) — enfoque mantenido por
          universal7420 en LOS 20. TODO(fase 4): evaluar Codec2. -->
     <hal format="hidl">
