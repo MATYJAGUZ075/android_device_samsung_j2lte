@@ -208,19 +208,35 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- Configstore 1.1 (FIX-034): declarado aquí porque el service
-         configstore@1.1-service se instala en vendor y sin esta entrada
-         su registerAsService() falla (crash-loop) una vez el VINTF global
-         deja de abortar por el conflicto de usb. -->
-    <hal format="hidl">
-        <name>android.hardware.configstore</name>
-        <transport>hwbinder</transport>
-        <version>1.1</version>
-        <interface>
-            <name>ISurfaceFlingerConfigs</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+    <!-- Configstore 1.1 — FIX-CONFIGSTORE: declaración retirada.
+         El comentario original (FIX-034) decía que configstore@1.1-service se
+         instalaba en vendor y que sin esta entrada su registerAsService()
+         fallaba. Eso ya no es cierto: configstore NO aparece en
+         PRODUCT_PACKAGES en device-common.mk ni en device.mk, y no hay
+         ningún binario configstore en los blobs de vendor. El servicio nunca
+         se construye, así que la entrada no puede registrar nada.
+
+         Por qué no es un riesgo de cuelgue (a diferencia de light):
+         verificado que en lineage-20.0 nadie consume el HIDL
+         ISurfaceFlingerConfigs fuera del propio módulo configstore.
+         SurfaceFlinger ya no lo consulta (0 referencias en services/surfaceflinger),
+         así que no hay waitForDeclaredService() que pueda quedarse bloqueando
+         el arranque.
+
+         Se retira la entrada porque es una declaración muerta: un <hal>
+         declarado sin servicio solo puede confundir el análisis del VINTF y
+         volver a introducir un modo de fallo si algún día algo lo consulta.
+         El módulo de AOSP sigue existiendo y se puede re-declarar si algún
+         componente empieza a usarlo. -->
+    <!--FIX-CONFIGSTORE     <hal format="hidl"> -->
+    <!--FIX-CONFIGSTORE         <name>android.hardware.configstore</name> -->
+    <!--FIX-CONFIGSTORE         <transport>hwbinder</transport> -->
+    <!--FIX-CONFIGSTORE         <version>1.1</version> -->
+    <!--FIX-CONFIGSTORE         <interface> -->
+    <!--FIX-CONFIGSTORE             <name>ISurfaceFlingerConfigs</name> -->
+    <!--FIX-CONFIGSTORE             <instance>default</instance> -->
+    <!--FIX-CONFIGSTORE         </interface> -->
+    <!--FIX-CONFIGSTORE     </hal> -->
     <!-- USB (FIX-034): NO se declara aquí. android.hardware.usb@1.0-service.basic
          (device-common.mk) instala su propio VINTF fragment
          (android.hardware.usb@1.0-service.basic.xml). Declararlo también en el
@@ -246,17 +262,26 @@
     <!-- Touch — FIX-026: bloque retirado TEMPORALMENTE; ver device-common.mk.
          (vendor.lineage.touch@1.0-service.samsung no es emitido por Soong;
          investigación N2 pendiente.) -->
-<!-- Trust HAL. TODO: vendor.lineage.trust fue retirado del árbol Lineage
-         en versiones recientes; eliminar esta entrada si no se mantiene. -->
-    <hal format="hidl">
-        <name>vendor.lineage.trust</name>
-        <transport>hwbinder</transport>
-        <version>1.0</version>
-        <interface>
-            <name>IUsbRestrict</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+<!-- Trust HAL — FIX-TRUST: entrada retirada.
+     vendor.lineage.trust fue retirado del árbol de Lineage en versiones
+     recientes, y el comentario original (FIX-026/TODO) ya decía "eliminar
+     esta entrada si no se mantiene". Verificado: no hay ningún módulo
+     vendor.lineage.trust en lineage-20.0 (0 resultados en Android.bp) y la
+     interfaz IUsbRestrict solo aparece referenciada en CtsVerifier (app de
+     pruebas, no incluida en el build) y en los manifests de framework.
+
+     Igual que configstore, no hay servicio que se construya ni consumidor
+     que espere, asi que no era un riesgo de cuelgue. Se retira la entrada
+     para no dejar un <hal> declarado que no corresponde a nada. -->
+    <!--FIX-TRUST     <hal format="hidl"> -->
+    <!--FIX-TRUST         <name>vendor.lineage.trust</name> -->
+    <!--FIX-TRUST         <transport>hwbinder</transport> -->
+    <!--FIX-TRUST         <version>1.0</version> -->
+    <!--FIX-TRUST         <interface> -->
+    <!--FIX-TRUST             <name>IUsbRestrict</name> -->
+    <!--FIX-TRUST             <instance>default</instance> -->
+    <!--FIX-TRUST         </interface> -->
+    <!--FIX-TRUST     </hal> -->
 
     <!-- ELIMINADAS respecto al manifest 17.1 (muertas en A13 o sin implementación planificada):
          - android.hardware.cas               (sin uso)
