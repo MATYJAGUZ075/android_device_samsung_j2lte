@@ -7,26 +7,53 @@
      - Las entradas marcadas TODO se ajustan en fases posteriores.
      Se instala via DEVICE_MANIFEST_FILE (ver BoardConfig.mk). -->
 <manifest version="1.0" type="device" target-level="3">
+    <!--FIX-AUDIO     <hal format="hidl"> -->
+    <!--FIX-AUDIO         <name>android.hardware.audio</name> -->
+    <!--FIX-AUDIO         <transport arch="32">passthrough</transport> -->
+    <!--FIX-AUDIO         <version>7.1</version> -->
+    <!--FIX-AUDIO         <interface> -->
+    <!--FIX-AUDIO             <name>IDevicesFactory</name> -->
+    <!--FIX-AUDIO             <instance>default</instance> -->
+    <!--FIX-AUDIO         </interface> -->
+    <!--FIX-AUDIO     </hal> -->
+    <!--FIX-AUDIO     <hal format="hidl"> -->
+    <!--FIX-AUDIO         <name>android.hardware.audio.effect</name> -->
+    <!--FIX-AUDIO         <transport arch="32">passthrough</transport> -->
+    <!--FIX-AUDIO         <version>7.0</version> -->
+    <!--FIX-AUDIO         <interface> -->
+    <!--FIX-AUDIO             <name>IEffectsFactory</name> -->
+    <!--FIX-AUDIO             <instance>default</instance> -->
+    <!--FIX-AUDIO         </interface> -->
+    <!--FIX-AUDIO     </hal> -->
     <!-- Audio: HIDL 7.x sobre audio.primary.universal3475 (passthrough 32-bit).
-         TODO(fase 4): requiere portar el primary HAL a la API 7.x. -->
-    <hal format="hidl">
-        <name>android.hardware.audio</name>
-        <transport arch="32">passthrough</transport>
-        <version>7.1</version>
-        <interface>
-            <name>IDevicesFactory</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
-    <hal format="hidl">
-        <name>android.hardware.audio.effect</name>
-        <transport arch="32">passthrough</transport>
-        <version>7.0</version>
-        <interface>
-            <name>IEffectsFactory</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+         TODO(fase 4): requiere portar el primary HAL a la API 7.x.
+
+         FIX-AUDIO: MEDIDO en la run 36957930373 (02/10/2026). El sistema no
+         terminaba de arrancar: 8 ANRs de system_server, todos con el mismo
+         stack, bloqueados en AudioService.<init> -> AudioDeviceBroker.init ->
+         AudioProductStrategy.initializeAudioProductStrategies ->
+         AudioSystem::listAudioProductStrategies ->
+         ServiceManagerShim::getService("audio_policy"). Esa espera no tiene
+         timeout, el watchdog de init mataba a system_server a los ~5 s y el
+         dispositivo reiniciaba en bucle (bootanimation -> negro -> bootanimation).
+
+         Causa: /data/tombstones/tombstone_0{2,4,6} de esa misma run muestran
+         /vendor/bin/hw/android.hardware.audio.service abortando con SIGABRT y
+         'Could not register Audio Core API' en main+2420 (el
+         ALOG_ALWAYS_FATAL_IF de AudioCore::addService). El HAL corre, pero no
+         logra registrarse, asi que audio_policy nunca aparece.
+
+         Por que se retira en vez de arreglarse aqui: el registro falla sobre
+         vndbinder, y el mismo fallo lo sufre configstore@1.1-service con
+         'Could not register ISurfaceFlingerConfigs'. Son los dos unicos HALs
+         que se registran sobre vndbinder, y ambos abortan. Eso apunta a un
+         problema de vndbinder / binarios de vendor de Android 6-7, no a algo
+         corregible desde el manifest.
+
+         CONSECUENCIA CONOCIDA: sin esta entrada el audio no funciona. Es un
+         desbloqueo de boot, no una solucion. El plan para restaurar el audio
+         de verdad esta en ANOMALIAS-BUGS-J2-2026-09-30.md (seccion BG, plan
+         de 5 vias). No reactivar hasta que el HAL levante. -->
     <!-- Bluetooth: HCI HIDL 1.0 custom (universal3475-common/hardware/bluetooth).
          Enfoque validado por Exynos7420 en LOS 20/21. -->
     <hal format="hidl">
@@ -114,16 +141,33 @@
         </interface>
     </hal>
     <!-- Keymaster 3.0 + TEE mobicore (enfoque Exynos7420 en LOS 20).
-         Plan B documentado en ANALISIS_LINEAGE20_REFERENCIAS.md: soft KM 4. -->
-    <hal format="hidl">
-        <name>android.hardware.keymaster</name>
-        <transport>hwbinder</transport>
-        <version>3.0</version>
-        <interface>
-            <name>IKeymasterDevice</name>
-            <instance>default</instance>
-        </interface>
-    </hal>
+         Plan B documentado en ANALISIS_LINEAGE20_REFERENCIAS.md: soft KM 4.
+
+         FIX-KEYMASTER: retirado preventivamente. Es el MISMO patron de fallo que
+         acaba de bloquear el boot con audio: HAL declarado, pero sin
+         implementacion que lo haga levantar. El plan B (soft KM 4) fue
+         desactivado por FIX-049 porque libkeymaster/ver0 usa headers de
+         Android 6-7 que no existen en LOS 20, asi que el keystore TEE no
+         aporta nada y solo queda el keymaster@3.0 generico de A13 contra un
+         blob de TEE ancient.
+
+         Es preventivo, no MEDIDO: todavia no se observo un fallo de keymaster
+         en la run 36957930373 porque el sistema no llegaba a esa fase. Se
+         retira ahora para no gastar una run de 6 h en descubrirlo.
+
+         CONSECUENCIA CONOCIDA: sin keystore funcional no hay cifrado del
+         almacenamiento. Es el siguiente bloqueante del port, con mas impacto
+         que el audio. Plan de restauracion en ANOMALIAS-BUGS-J2-2026-09-30.md
+         (seccion BG). No reactivar sin un keymaster que levante. -->
+    <!--FIX-KEYMASTER    <hal format="hidl"> -->
+    <!--FIX-KEYMASTER        <name>android.hardware.keymaster</name> -->
+    <!--FIX-KEYMASTER        <transport>hwbinder</transport> -->
+    <!--FIX-KEYMASTER        <version>3.0</version> -->
+    <!--FIX-KEYMASTER        <interface> -->
+    <!--FIX-KEYMASTER            <name>IKeymasterDevice</name> -->
+    <!--FIX-KEYMASTER            <instance>default</instance> -->
+    <!--FIX-KEYMASTER        </interface> -->
+    <!--FIX-KEYMASTER    </hal> -->
     <!-- Lights: android.hardware.light@2.0-service.samsung (hardware/samsung).
          FIX-024: ese servicio NO existe en hardware/samsung lineage-20 (no hay
          dir lights), igual que paso con power@1.0 (FIX-035). Con el HAL
