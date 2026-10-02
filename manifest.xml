@@ -7,53 +7,52 @@
      - Las entradas marcadas TODO se ajustan en fases posteriores.
      Se instala via DEVICE_MANIFEST_FILE (ver BoardConfig.mk). -->
 <manifest version="1.0" type="device" target-level="3">
-    <!--FIX-AUDIO     <hal format="hidl"> -->
-    <!--FIX-AUDIO         <name>android.hardware.audio</name> -->
-    <!--FIX-AUDIO         <transport arch="32">passthrough</transport> -->
-    <!--FIX-AUDIO         <version>7.1</version> -->
-    <!--FIX-AUDIO         <interface> -->
-    <!--FIX-AUDIO             <name>IDevicesFactory</name> -->
-    <!--FIX-AUDIO             <instance>default</instance> -->
-    <!--FIX-AUDIO         </interface> -->
-    <!--FIX-AUDIO     </hal> -->
-    <!--FIX-AUDIO     <hal format="hidl"> -->
-    <!--FIX-AUDIO         <name>android.hardware.audio.effect</name> -->
-    <!--FIX-AUDIO         <transport arch="32">passthrough</transport> -->
-    <!--FIX-AUDIO         <version>7.0</version> -->
-    <!--FIX-AUDIO         <interface> -->
-    <!--FIX-AUDIO             <name>IEffectsFactory</name> -->
-    <!--FIX-AUDIO             <instance>default</instance> -->
-    <!--FIX-AUDIO         </interface> -->
-    <!--FIX-AUDIO     </hal> -->
-    <!-- Audio: HIDL 7.x sobre audio.primary.universal3475 (passthrough 32-bit).
-         TODO(fase 4): requiere portar el primary HAL a la API 7.x.
-
-         FIX-AUDIO: MEDIDO en la run 36957930373 (02/10/2026). El sistema no
-         terminaba de arrancar: 8 ANRs de system_server, todos con el mismo
-         stack, bloqueados en AudioService.<init> -> AudioDeviceBroker.init ->
-         AudioProductStrategy.initializeAudioProductStrategies ->
-         AudioSystem::listAudioProductStrategies ->
-         ServiceManagerShim::getService("audio_policy"). Esa espera no tiene
-         timeout, el watchdog de init mataba a system_server a los ~5 s y el
+    <!-- Audio: HIDL 7.x binderizado (android.hardware.audio.service).
+         FIX-AUDIO: MEDIDO en la run 36957930373 (02/10/2026) y CONFIRMADO
+         on-device el 02/10/2026. El sistema no terminaba de arrancar: 8 ANRs
+         de system_server, todos bloqueados en AudioService.<init> ->
+         AudioSystem::listAudioProductStrategies -> getService("audio_policy").
+         Esa espera no tiene timeout; el watchdog mataba a system_server y el
          dispositivo reiniciaba en bucle (bootanimation -> negro -> bootanimation).
 
-         Causa: /data/tombstones/tombstone_0{2,4,6} de esa misma run muestran
-         /vendor/bin/hw/android.hardware.audio.service abortando con SIGABRT y
-         'Could not register Audio Core API' en main+2420 (el
-         ALOG_ALWAYS_FATAL_IF de AudioCore::addService). El HAL corre, pero no
-         logra registrarse, asi que audio_policy nunca aparece.
+         Causa raiz (confirmada on-device): /vendor/bin/hw/android.hardware.audio.service
+         abortaba con SIGABRT y 'Could not register Audio Core API' porque
+         android.hardware.audio@7.1::IDevicesFactory/default no estaba
+         declarado en el manifiesto VINTF, y el servicio es BINDERIZADO:
+             E HidlServiceManagement: Service android.hardware.audio@7.1::
+             IDevicesFactory/default must be in VINTF manifest in order to
+             register/get.
+             E LegacySupport: Could not register service ... (-2147483648)
+         La declaracion previa usaba <transport arch="32">passthrough</transport>,
+         que hwservicemanager rechaza para un servicio que se registra en
+         hwbinder. NO era un problema de vndbinder (hipotesis descartada).
 
-         Por que se retira en vez de arreglarse aqui: el registro falla sobre
-         vndbinder, y el mismo fallo lo sufre configstore@1.1-service con
-         'Could not register ISurfaceFlingerConfigs'. Son los dos unicos HALs
-         que se registran sobre vndbinder, y ambos abortan. Eso apunta a un
-         problema de vndbinder / binarios de vendor de Android 6-7, no a algo
-         corregible desde el manifest.
+         Fix: declarar ambas HALs como hwbinder.
+         Verificado on-device: con esta entrada el audio deja de abortar (cero
+         tombstones de audio tras el reinicio) y el sistema arranca hasta
+         SystemUI. Nota: configstore@1.1 sigue abortando por la misma razon
+         (entrada retirada en 3772df5) pero ya no bloquea el arranque.
 
-         CONSECUENCIA CONOCIDA: sin esta entrada el audio no funciona. Es un
-         desbloqueo de boot, no una solucion. El plan para restaurar el audio
-         de verdad esta en ANOMALIAS-BUGS-J2-2026-09-30.md (seccion BG, plan
-         de 5 vias). No reactivar hasta que el HAL levante. -->
+         Restauracion de audio funcional (calidad, no solo registro) pendiente
+         en ANOMALIAS-BUGS-J2-2026-09-30.md (seccion BG). -->
+    <hal format="hidl">
+        <name>android.hardware.audio</name>
+        <transport>hwbinder</transport>
+        <version>7.1</version>
+        <interface>
+            <name>IDevicesFactory</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl">
+        <name>android.hardware.audio.effect</name>
+        <transport>hwbinder</transport>
+        <version>7.0</version>
+        <interface>
+            <name>IEffectsFactory</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <!-- Bluetooth: HCI HIDL 1.0 custom (universal3475-common/hardware/bluetooth).
          Enfoque validado por Exynos7420 en LOS 20/21. -->
     <hal format="hidl">
