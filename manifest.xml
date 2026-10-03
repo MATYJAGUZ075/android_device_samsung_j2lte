@@ -139,34 +139,26 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- Keymaster 3.0 + TEE mobicore (enfoque Exynos7420 en LOS 20).
-         Plan B documentado en ANALISIS_LINEAGE20_REFERENCIAS.md: soft KM 4.
+    <!-- Keymaster 3.0 (soft, sin TEE) — RE-ACTIVADO (03/10/2026).
+         El bootloop real NO era por keymaster ni por falta de TEE: era el
+         binder del kernel 3.10 sin BR_TRANSACTION_SEC_CTX (calling_sid) ->
+         keystore2 no podia chequear permisos. Ver seccion BL de
+         ANOMALIAS-BUGS-J2-2026-09-30.md (fix de kernel `13eaf70c`).
 
-         FIX-KEYMASTER: retirado preventivamente. Es el MISMO patron de fallo que
-         acaba de bloquear el boot con audio: HAL declarado, pero sin
-         implementacion que lo haga levantar. El plan B (soft KM 4) fue
-         desactivado por FIX-049 porque libkeymaster/ver0 usa headers de
-         Android 6-7 que no existen en LOS 20, asi que el keystore TEE no
-         aporta nada y solo queda el keymaster@3.0 generico de A13 contra un
-         blob de TEE ancient.
-
-         Es preventivo, no MEDIDO: todavia no se observo un fallo de keymaster
-         en la run 36957930373 porque el sistema no llegaba a esa fase. Se
-         retira ahora para no gastar una run de 6 h en descubrirlo.
-
-         CONSECUENCIA CONOCIDA: sin keystore funcional no hay cifrado del
-         almacenamiento. Es el siguiente bloqueante del port, con mas impacto
-         que el audio. Plan de restauracion en ANOMALIAS-BUGS-J2-2026-09-30.md
-         (seccion BG). No reactivar sin un keymaster que levante. -->
-    <!--FIX-KEYMASTER    <hal format="hidl"> -->
-    <!--FIX-KEYMASTER        <name>android.hardware.keymaster</name> -->
-    <!--FIX-KEYMASTER        <transport>hwbinder</transport> -->
-    <!--FIX-KEYMASTER        <version>3.0</version> -->
-    <!--FIX-KEYMASTER        <interface> -->
-    <!--FIX-KEYMASTER            <name>IKeymasterDevice</name> -->
-    <!--FIX-KEYMASTER            <instance>default</instance> -->
-    <!--FIX-KEYMASTER        </interface> -->
-    <!--FIX-KEYMASTER    </hal> -->
+         Se habia retirado en 1f88930 (FIX-KEYMASTER, preventivo y NO medido).
+         Se re-activa para mantener paridad con el dispositivo: el servicio
+         /vendor/bin/hw/android.hardware.keymaster@3.0-service existe
+         (class early_hal) y el sistema arranca con esta declaracion. Es el
+         keymaster SOFTWARE (impl enlaza libsoftkeymasterdevice), sin TEE. -->
+    <hal format="hidl">
+        <name>android.hardware.keymaster</name>
+        <transport>hwbinder</transport>
+        <version>3.0</version>
+        <interface>
+            <name>IKeymasterDevice</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <!-- Lights: android.hardware.light@2.0-service.samsung (hardware/samsung).
          FIX-024: ese servicio NO existe en hardware/samsung lineage-20 (no hay
          dir lights), igual que paso con power@1.0 (FIX-035). Con el HAL
