@@ -1,10 +1,38 @@
 # System properties específicas de j2lte (formato LOS20: system.prop,
 # consumido via TARGET_SYSTEM_PROP en BoardConfig.mk).
 
-# Dalvik/Art (1.5GB RAM, 32-bit)
+# Dalvik/Art.
+#
+# FIX-021 (04/10/2026): heapsize de 512m a 256m.
+#
+# El comentario decia "1.5GB RAM" y el valor estaba chose para eso, pero el
+# device tiene 880 MB REALES. Medido en /proc/meminfo con el build
+# 20.0-20261003-UNOFFICIAL-j2lte:
+#
+#   MemTotal:  900556 kB     <- 880 MB, no 1.5 GB
+#   MemFree:   ~83000 kB
+#   GL mtrack: 125423 kB  +  EGL mtrack: 57148 kB  = 178 MB solo en graficos
+#   dalvik.vm.heapsize = 512m  (el valor que traia esta linea)
+#
+# Con 512m de heap, 178 MB de graficos y el LMK in-kernel roto
+# ("lowmemorykiller: kernel lmk event file could not be opened; errno=2", o
+# sea que nadie libera memoria bajo presion), la presion es constante. Sintoma
+# medido en el telefono:
+#
+#   E ion: ioctl c0144900 failed with code -1: Out of memory   (system_server)
+#     -> el AudioTrack no puede reservar sus buffers DMA
+#     -> E SoundPool::Sound: doLoad: unable to load sound
+#     -> dumpsys media.audio_flinger: numTracks=0, Total writes: 0
+#     -> ningun sonido
+#
+# A 256m el heap entra con holgura en 880 MB.
+#
+# OJO: esto NO explica por si solo el crash de system_server. Ese es eBPF
+# ausente (FIX-020, parche 0002-appprofessor-skip-gpu-mem-bpf.patch en el repo
+# j2lte-build). Son dos problemas distintos que conviven en el mismo device.
 dalvik.vm.heapstartsize=8m
 dalvik.vm.heapgrowthlimit=128m
-dalvik.vm.heapsize=512m
+dalvik.vm.heapsize=256m
 dalvik.vm.heaptargetutilization=0.75
 dalvik.vm.heapminfree=2m
 dalvik.vm.heapmaxfree=8m
