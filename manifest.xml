@@ -64,12 +64,11 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- Camera: wrapper legacy contra provider 2.4.
-         TODO(fase 3): evaluar subida a 2.5 (instancia legacy/0). -->
+    <!-- Camera: wrapper legacy contra provider 2.5 (instancia legacy/0). -->
     <hal format="hidl">
         <name>android.hardware.camera.provider</name>
         <transport>hwbinder</transport>
-        <version>2.4</version>
+        <version>2.5</version>
         <interface>
             <name>ICameraProvider</name>
             <instance>legacy/0</instance>
