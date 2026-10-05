@@ -83,7 +83,22 @@ void set_sim_info()
 
     if (ReadFileToString(simslot_count_path, &simslot_count)) {
         simslot_count = Trim(simslot_count); // strip newline
-        property_override("ro.multisim.simslotcount", simslot_count.c_str());
+        property_override("ro.vendor.multisim.simslotcount", simslot_count.c_str());
+
+        /*
+         * persist.radio.multisim.config must always be set. rild reads it to
+         * decide how many modems to bring up, and on Android 13 it does not
+         * start at all when the property is absent: no ril.RildInit, no
+         * gsm.version.baseband, and the telephony stack never registers.
+         *
+         * It used to be assigned only inside the dual-SIM branch, so on a
+         * single-SIM device it was never assigned at all. Set the single-SIM
+         * default first and let the dual-SIM case override it.
+         *
+         * The simslotcount property also goes through the vendor namespace,
+         * which is where the framework looks for vendor-prefixed properties.
+         */
+        property_override("persist.radio.multisim.config", "ss");
         if (simslot_count.compare("2") == 0) {
             property_override("rild.libpath2", "/system/lib/libsec-ril-dsds.so");
             property_override("persist.radio.multisim.config", "dsds");
