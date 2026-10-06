@@ -231,11 +231,22 @@
             <instance>slot1</instance>
         </interface>
     </hal>
-    <!-- Sensors: blob sensors.universal3475.so vía passthrough 1.0.
-         TODO(fase 4): wrapper multihal si hace falta. -->
+    <!-- Sensors: wrapper HIDL de A13 (android.hardware.sensors@1.0-impl
+         + @1.0-service) sobre el blob sensors.universal3475.so.
+
+         El transporte era passthrough y por eso el servicio no se registraba:
+           E HidlServiceManagement: Service
+             android.hardware.sensors@1.0::ISensors/default must be in VINTF
+             manifest in order to register/get.
+           E LegacySupport: Could not register service ... (-2147483648)
+
+         passthrough significa que no hay envoltorio HIDL y que el framework
+         habla directo con el blob. Al shippear el wrapper hay que declarar
+         hwbinder, igual que ya hace vibrator. El arch="32" se conserva porque
+         el servicio se compila solo multilib 32. -->
     <hal format="hidl">
         <name>android.hardware.sensors</name>
-        <transport arch="32">passthrough</transport>
+        <transport arch="32">hwbinder</transport>
         <version>1.0</version>
         <interface>
             <name>ISensors</name>
