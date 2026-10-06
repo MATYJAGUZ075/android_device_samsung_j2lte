@@ -242,11 +242,20 @@
 
          passthrough significa que no hay envoltorio HIDL y que el framework
          habla directo con el blob. Al shippear el wrapper hay que declarar
-         hwbinder, igual que ya hace vibrator. El arch="32" se conserva porque
-         el servicio se compila solo multilib 32. -->
+         hwbinder, igual que ya hace vibrator.
+
+         El atributo arch="32" se quito de aqui a proposito: assemble_vintf lo
+         acepta sobre passthrough pero lo rechaza sobre hwbinder, y el build
+         muera con:
+
+           Error when attempting to convert to manifest: Could not parse
+           element with name <hal> in element <manifest>
+
+         El servicio se compila solo multilib 32 igual que vibrator, y ese HAL
+         tampoco lleva arch. -->
     <hal format="hidl">
         <name>android.hardware.sensors</name>
-        <transport arch="32">hwbinder</transport>
+        <transport>hwbinder</transport>
         <version>1.0</version>
         <interface>
             <name>ISensors</name>
