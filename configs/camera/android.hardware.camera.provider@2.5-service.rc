@@ -1,0 +1,38 @@
+# The vendor camera provider is not started on this device.
+#
+# Its legacy passthrough crashes the whole camera stack in a loop. cameraserver
+# asks the provider to notify a device state change, the call reaches
+# CameraModule::notifyDeviceStateChange in the legacy shim, and that
+# dereferences an mModule left null because the HAL underneath never
+# initialises:
+#
+#   F/libc : Fatal signal 11 (SIGSEGV), fault addr 0x8
+#            CameraModule::notifyDeviceStateChange
+#            (android.hardware.camera.provider@2.4-legacy.so)
+#
+# The provider dies, cameraserver gets DEAD_OBJECT, the HIDL
+# return_status::assertOk() fails and it aborts as well. init restarts both,
+# so the pair repeats about once per second: 26 crashes per 25 s measured on
+# the phone, on a device with 814 MB of RAM, which also floods the logcat and
+# destroys the early-boot evidence.
+#
+# Not starting the service stops the loop. Measured on the phone: crashes go
+# to 0, cameraserver stays up and stable, dumpsys media.camera answers
+# instead of reporting "Can't find service", and roughly 30 MB of RAM come
+# back.
+#
+# The camera still enumerates zero devices, since the HAL under it never finds
+# any sensor. This only removes the crash loop.
+#
+# This replaces the copy that ships in the vendor blobs. It is placed after
+# every inherit-product in this file so that it wins the make ordering.
+service vendor.camera-provider-2-5 /vendor/bin/hw/android.hardware.camera.provider@2.5-service
+#   interface android.hardware.camera.provider@2.5::ICameraProvider legacy/0
+#   interface android.hardware.camera.provider@2.4::ICameraProvider legacy/0
+#   class hal
+    user cameraserver
+    group audio camera input drmrpc
+    ioprio rt 4
+    capabilities SYS_NICE
+    task_profiles CameraServiceCapacity MaxPerformance
+    disabled

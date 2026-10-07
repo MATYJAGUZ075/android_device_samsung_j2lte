@@ -124,3 +124,9 @@ $(call inherit-product, device/samsung/universal3475-common/device-common.mk)
 
 # Call the proprietary setup
 $(call inherit-product, vendor/samsung/j2lte/j2lte-vendor.mk)
+
+# Last word on the camera provider. This has to come after every
+# inherit-product above: PRODUCT_COPY_FILES writes the same destination and
+# make keeps the last one assigned, so a copy added earlier would be undone.
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/camera/android.hardware.camera.provider@2.5-service.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.camera.provider@2.5-service.rc
