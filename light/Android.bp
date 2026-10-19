@@ -1,0 +1,80 @@
+// Copyright (C) 2026 The LineageOS Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// HAL de luces propio.
+//
+// En lineage-20 no existe android.hardware.light@2.0-service.samsung
+// (hardware/samsung no tiene el directorio lights), y android.hardware.light
+// quedo fuera del manifest VINTF para que LightsService no se colgara
+// esperando un servicio inexistente. El resultado es que en A13 el brillo de
+// la pantalla no llega a ningun lado: DisplayPowerController usa un
+// BacklightAdapter que envuelve LightsService$LightImpl, y sin HAL el
+// framework guarda el valor pero no lo aplica.
+//
+// Medido en el telefono con este arbol:
+//   $ dumpsys display
+//     mBacklightAdapter=BacklightAdapter [... backlight=LightsService$LightImpl@...]
+//     mDisplayDeviceConfig=DisplayDeviceConfig{... mBacklight=null, mRawBacklight=null ...}
+//   $ dumpsys lights
+//     Service: hidl
+//     Light id=0 ordinal=1 color=ff3e3e3e
+//     Session clients:
+//   $ lshal | grep light
+//     (nada: no hay ningun android.hardware.light@2.0::ILight/default)
+//
+// Este servicio implementa ILight y escribe el brillo en el sysfs del panel.
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_library_shared {
+    name: "android.hardware.light@2.0-impl.samsung",
+    defaults: ["hidl_defaults"],
+    vendor: true,
+    relative_install_path: "hw",
+    srcs: ["Light.cpp"],
+
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libhidlbase",
+        "libutils",
+        "android.hardware.light@2.0",
+    ],
+}
+
+cc_defaults {
+    name: "light_service_defaults",
+    relative_install_path: "hw",
+    defaults: ["hidl_defaults"],
+    vendor: true,
+
+    shared_libs: [
+        "liblog",
+        "libbase",
+        "libdl",
+        "libutils",
+        "libhidlbase",
+        "android.hardware.light@2.0",
+    ],
+}
+
+cc_binary {
+    name: "android.hardware.light@2.0-service.samsung",
+    defaults: ["light_service_defaults"],
+    init_rc: ["android.hardware.light@2.0-service.rc"],
+    srcs: ["service.cpp"],
+    shared_libs: ["android.hardware.light@2.0-impl.samsung"],
+}

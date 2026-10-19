@@ -130,3 +130,21 @@ $(call inherit-product, vendor/samsung/j2lte/j2lte-vendor.mk)
 # make keeps the last one assigned, so a copy added earlier would be undone.
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/camera/android.hardware.camera.provider@2.5-service.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.camera.provider@2.5-service.rc
+
+# Lights (device/samsung/j2lte/light): HAL propio de android.hardware.light@2.0.
+#
+# En lineage-20 no existe android.hardware.light@2.0-service.samsung (hardware/samsung
+# no tiene el directorio lights), y android.hardware.light quedo fuera del manifest
+# VINTF para que LightsService no se colgara esperando un servicio inexistente.
+# En A13 el brillo de la pantalla lo aplica DisplayPowerController a traves de un
+# BacklightAdapter que envuelve LightsService$LightImpl, asi que sin HAL el valor
+# se guarda pero no llega al panel:
+#
+#   dumpsys display -> mDisplayDeviceConfig=DisplayDeviceConfig{... mBacklight=null ...}
+#   dumpsys lights  -> Light id=0 ordinal=1 color=ff3e3e3e
+#   lshal | grep light -> nada
+#
+# El servicio propio escribe en /sys/class/backlight/panel/brightness, que el driver
+# del panel ya expone whose rango es 0..max_brightness (355 en este equipo).
+PRODUCT_PACKAGES += \
+    android.hardware.light@2.0-service.samsung

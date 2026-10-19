@@ -172,17 +172,31 @@
          notificaciones y el brillo automatico (que ya no funcionaban porque el
          sistema reiniciaba antes de llegar a usarlos).
 
+         La declaracion vuelve con un servicio propio en device/samsung/j2lte/light
+         (android.hardware.light@2.0-service.samsung), que implementa ILight y
+         escribe el brillo en /sys/class/backlight/panel/brightness. Con el HAL
+         declarado pero sin implementacion, LightsService.setLight_native() se
+         queda esperando y el watchdog reinicia el sistema en bucle, que es
+         exactamente lo que paso la primera vez: por eso el servicio propio
+         tiene que registrarse de verdad antes de dar por buena la declaracion.
+
+         Medido en el telefono con este arbol, sin HAL de luces:
+           dumpsys display -> mBacklightAdapter=BacklightAdapter [... LightsService$LightImpl@...]
+                               mDisplayDeviceConfig=DisplayDeviceConfig{... mBacklight=null ...}
+           dumpsys lights  -> Light id=0 ordinal=1 color=ff3e3e3e  (valor guardado, nunca aplicado)
+           lshal | grep light -> nada
+
          Verificado en el dispositivo antes de aplicar: el manifest parsea como
          XML valido y queda en 17 <hal> activos. -->
-    <!--FIX-LIGHT     <hal format="hidl"> -->
-    <!--FIX-LIGHT         <name>android.hardware.light</name> -->
-    <!--FIX-LIGHT         <transport>hwbinder</transport> -->
-    <!--FIX-LIGHT         <version>2.0</version> -->
-    <!--FIX-LIGHT         <interface> -->
-    <!--FIX-LIGHT             <name>ILight</name> -->
-    <!--FIX-LIGHT             <instance>default</instance> -->
-    <!--FIX-LIGHT         </interface> -->
-    <!--FIX-LIGHT     </hal> -->
+    <hal format="hidl">
+        <name>android.hardware.light</name>
+        <transport>hwbinder</transport>
+        <version>2.0</version>
+        <interface>
+            <name>ILight</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
     <!-- Media OMX: codecs SLSI Samsung (openmax) — enfoque mantenido por
          universal7420 en LOS 20. TODO(fase 4): evaluar Codec2. -->
     <hal format="hidl">

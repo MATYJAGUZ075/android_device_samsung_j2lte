@@ -19,6 +19,10 @@ include device/samsung/universal3475-common/BoardConfigCommon.mk
 
 LOCAL_PATH := device/samsung/j2lte
 
+# El arbol del device tiene modulos Soong propios (light/ con el HAL de luces).
+# Sin esto, los modulos vendor:true no se instalan en /vendor.
+PRODUCT_SOONG_NAMESPACES += $(LOCAL_PATH)
+
 TARGET_OTA_ASSERT_DEVICE := j2lte,j2ltedd,j2ltedx
 
 # Bluetooth
