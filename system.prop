@@ -53,3 +53,85 @@ ro.telephony.get_imsi_from_sim=true
 ro.ril.force_eri_from_xml=true
 ro.ril.hsxpa=1
 ro.ril.gprsclass=10
+
+# Bluetooth: perfiles del stack de A13.
+#
+# En A13 el app de Bluetooth arranca cada servicio de perfil segun
+# XxxService.isEnabled(), que devuelve
+# BluetoothProperties.isProfileXxxEnabled().orElse(false). Si la sysprop no
+# existe, el perfil queda deshabilitado y su servicio nunca arranca.
+#
+# En este build no habia ninguna de esas sysprops, asi que el unico perfil que
+# arrancaba era GATT (que el stack asume soportado). Medido en el telefono:
+#
+#   $ dumpsys bluetooth_manager
+#     Enabled Profile Services:
+#       GattService
+#     A2DP State:
+#     A2DP Source State: Disabled
+#     A2DP Sink State: Disabled
+#     AVRCP Target Service not started
+#   $ dumpsys activity services com.android.bluetooth
+#     * ServiceRecord{... com.android.bluetooth/.btservice.AdapterService}
+#     * ServiceRecord{... com.android.bluetooth/.gatt.GattService}
+#   $ getprop bluetooth.profile.a2dp.source.enabled
+#     (vacio: la propiedad no existe)
+#
+# Con eso el auricular aparecia y se emparejaba, pero ningun perfil se
+# conectaba nunca. El log del stack lo deja claro:
+#
+#   W A2dpService: getA2dpService(): service is null
+#   D CachedBluetoothDevice: No profiles. Maybe we will connect later for device 41:42:e2:88:4e:5a
+#   I bt_btif_dm: Bond state changed to state=2 [bonded]
+#   I bt_btif_dm: SDP search done (encuentra 110b A2DP, 110e AVRCP, 111e)
+#   W l2c_link: l2c_link_timeout
+#   I btm_acl : Disconnecting peer reason:Remote Terminated Connection
+#
+# O sea: el enlace ACL se levanta, se autentica, se empareja y el SDP encuentra
+# los UUIDs correctos, pero como no hay servicio A2DP que abra su canal
+# L2CAP, el enlace se queda ocioso y a los 4 s el L2CAP da timeout y tira la
+# conexion. El auricular "sale" pero nunca queda conectado.
+#
+# Se habilitan los perfiles que este equipo puede hacer de verdad:
+#   a2dp.source        -> audio del telefono a los auriculares
+#   avrcp.controller   -> control de medios (play/pausa) en el auricular
+#   hfp.hf             -> manos libres
+#   hid.host/device    -> teclado y raton por BT
+#   pbap.client        -> agenda
+#   pan.nap            -> tethering
+#   opp                -> transferencia de archivos
+#   map.client         -> SMS/MMS
+#   gatt               -> BLE
+#
+# Los de audio LE, LE Audio, CSIP, HAP, ASHA, BASS, MCP, SAP, MAP/PBAP server y
+# A2DP sink quedan apagados: este equipo no tiene el hardware ni el caso de uso
+# (no es un altavoz, no hace de sink de audio, no hay LE Audio).
+bluetooth.profile.gatt.enabled=true
+bluetooth.profile.a2dp.source.enabled=true
+bluetooth.profile.avrcp.controller.enabled=true
+bluetooth.profile.hfp.hf.enabled=true
+bluetooth.profile.hid.host.enabled=true
+bluetooth.profile.hid.device.enabled=true
+bluetooth.profile.pbap.client.enabled=true
+bluetooth.profile.pan.nap.enabled=true
+bluetooth.profile.opp.enabled=true
+bluetooth.profile.map.client.enabled=true
+
+bluetooth.profile.a2dp.sink.enabled=false
+bluetooth.profile.avrcp.target.enabled=false
+bluetooth.profile.map.server.enabled=false
+bluetooth.profile.pbap.server.enabled=false
+bluetooth.profile.sap.server.enabled=false
+bluetooth.profile.mcp.server.enabled=false
+bluetooth.profile.pan.panu.enabled=false
+bluetooth.profile.hap.client.enabled=false
+bluetooth.profile.hfp.ag.enabled=false
+bluetooth.profile.asha.central.enabled=false
+bluetooth.profile.bap.broadcast.assist.enabled=false
+bluetooth.profile.bap.broadcast.source.enabled=false
+bluetooth.profile.bap.unicast.client.enabled=false
+bluetooth.profile.bas.client.enabled=false
+bluetooth.profile.bass.client.enabled=false
+bluetooth.profile.ccp.server.enabled=false
+bluetooth.profile.csip.set_coordinator.enabled=false
+bluetooth.profile.vcp.controller.enabled=false
