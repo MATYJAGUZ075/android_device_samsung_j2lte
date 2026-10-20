@@ -1,0 +1,10 @@
+// RRO de "negro puro" sobre el launcher.
+//
+// El fondo del launcher es propio (no usa el del framework), asi que hace
+// falta un RRO aparte. Ver ../framework/Android.bp para el resto de detalles.
+runtime_resource_overlay {
+    name: "j2lte-pure-black-launcher",
+    product_specific: true,
+    certificate: "platform",
+    resource_dirs: ["res"],
+}

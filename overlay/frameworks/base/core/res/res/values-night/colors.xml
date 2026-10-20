@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Negro puro en el tema oscuro, en vez del #121212 de A13.
+
+     Va por la via del overlay del device tree (que ya se usa para el config.xml
+     de este mismo paquete), y no solo por el RRO: si el RRO no llegara a
+     aplicarse, el fondo sigue siendo negro puro.
+-->
+<resources>
+    <color name="colorBackground">#000000</color>
+    <color name="background_material_dark">#000000</color>
+    <color name="colorBackgroundFloating">#000000</color>
+</resources>

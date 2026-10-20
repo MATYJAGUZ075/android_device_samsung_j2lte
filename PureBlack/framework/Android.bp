@@ -1,0 +1,22 @@
+// RRO de "negro puro" sobre framework-res.
+//
+// En A13 AOSP el fondo del tema oscuro es #121212 (background_material_dark) y
+// con el color dinamico de Material You el tono depende del wallpaper. En la
+// linea 19/20 el tema oscuro era negro puro, y en un panel TN de 240 ppi se
+// nota bastante.
+//
+// Este RRO cubre el framework, Ajustes, SystemUI y las apps del sistema. El
+// del launcher esta en ../launcher.
+//
+// Cada RRO necesita su propio directorio con su Android.bp: Soong busca el
+// AndroidManifest.xml en el directorio del Android.bp, no en un subdirectorio.
+//
+// El overlay NO es estatico: se habilita desde el init (ver
+// ../pure-black.rc) igual que el de los gestos, de forma que si algo fuera mal
+// se puede apagar sin tocar la build.
+runtime_resource_overlay {
+    name: "j2lte-pure-black-framework",
+    product_specific: true,
+    certificate: "platform",
+    resource_dirs: ["res"],
+}
