@@ -10,7 +10,7 @@
 # ro.product.model lo ajusta libinit_j2lte en el arranque segun la variante
 # de hardware, asi que aqui se deja el del modelo base.
 
-$(call inherit-product, device/samsung/j2lte/lineage_j2lte_common.mk)
+include device/samsung/j2lte/lineage_j2lte_common.mk
 
 PRODUCT_NAME := lineage_j2ltedx
 PRODUCT_DEVICE := j2ltedx
