@@ -193,3 +193,12 @@ PRODUCT_COPY_FILES += \
 # swapon fallan con un aviso de init y el boot continua igual.
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/Optimizations/zram.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-zram.rc
+
+# Daemon MTP de Samsung (ya esta en el vendor como /vendor/bin/mtpd).
+#
+# Es el que habla con el driver f_mtp_samsung (CONFIG_USB_ANDROID_SAMSUNG_MTP
+# en el kernel) a traves de /dev/usb_mtp_gadget, y el que sirve el protocolo
+# MTP por el socket /dev/socket/mtp. Sin el servicio, la funcion mtp del
+# gadget no sirve nada.
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/Optimizations/usb-mtp.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-mtpd.rc

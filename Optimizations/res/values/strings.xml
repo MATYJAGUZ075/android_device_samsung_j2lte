@@ -8,4 +8,9 @@
     <string name="opt_finish_activities">Destruir actividades al salir</string>
     <string name="opt_finish_activities_summary">Cierra cada actividad al salir en vez de dejarla en memoria</string>
     <string name="opt_trim_caches">Limpiar la cache de las apps</string>
+    <string name="opt_usb_function">Funcion USB</string>
+    <string name="opt_usb_apply">Aplicar funcion USB</string>
+    <string name="opt_usb_notif_channel">Conexion USB</string>
+    <string name="opt_usb_notif_title">USB conectado</string>
+    <string name="opt_usb_notif_text">Toca para cambiar la funcion USB</string>
 </resources>

@@ -1,0 +1,16 @@
+# Daemon MTP de Samsung.
+#
+# El driver del kernel (f_mtp_samsung, CONFIG_USB_ANDROID_SAMSUNG_MTP) expone
+# /dev/usb_mtp_gadget, y el daemon /vendor/bin/mtpd (que ya viene en el
+# vendor) es el que habla con el y sirve el protocolo MTP.
+#
+# El init.universal3475.rc del device tree ya deja los permisos:
+#   chmod 0660 /dev/usb_mtp_gadget
+#   chown system mtp /dev/usb_mtp_gadget
+#   mkdir /dev/socket/mtp 0770 system mtp
+#
+# Sin este servicio el daemon no arranca y la funcion mtp no sirve nada.
+service mtpd /vendor/bin/mtpd
+    class core
+    user system
+    group system mtp
