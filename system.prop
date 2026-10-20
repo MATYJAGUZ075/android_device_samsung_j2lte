@@ -30,12 +30,28 @@
 # OJO: esto NO explica por si solo el crash de system_server. Ese es eBPF
 # ausente (FIX-020, parche 0002-appprofessor-skip-gpu-mem-bpf.patch en el repo
 # j2lte-build). Son dos problemas distintos que conviven en el mismo device.
+#
+# Ajustes de ART para el equipo de 814 MB (FIX-042). Medido:
+#   $ grep MemTotal /proc/meminfo
+#   MemTotal:         833904 kB
+#   $ cat /proc/swaps
+#   /dev/block/vnswap0   partition  1048572  328536  -1
+#
+# El heap por app baja a 192m y la liberacion de heap es mas agresiva
+# (heaptargetutilization 0.5, heapmaxfree 2m). El limite de 512 MB del
+# compilador de dex (dex2oat) baja a 192m para no tirar de 512 MB de RAM
+# durante el arranque, y se quita el segundo pase de dexopt.
 dalvik.vm.heapstartsize=8m
-dalvik.vm.heapgrowthlimit=128m
-dalvik.vm.heapsize=256m
-dalvik.vm.heaptargetutilization=0.75
-dalvik.vm.heapminfree=2m
-dalvik.vm.heapmaxfree=8m
+dalvik.vm.heapgrowthlimit=96m
+dalvik.vm.heapsize=192m
+dalvik.vm.heaptargetutilization=0.5
+dalvik.vm.heapminfree=1m
+dalvik.vm.heapmaxfree=2m
+dalvik.vm.dex2oat-Xmx=192m
+dalvik.vm.dex2oat-Xms=32m
+dalvik.vm.image-dex2oat-Xmx=32m
+dalvik.vm.image-dex2oat-Xms=32m
+dalvik.vm.dexopt.secondary=false
 
 # Radio (blob libsec-ril.so / módem tss310)
 telephony.lteOnCdmaDevice=0
@@ -135,3 +151,17 @@ bluetooth.profile.bass.client.enabled=false
 bluetooth.profile.ccp.server.enabled=false
 bluetooth.profile.csip.set_coordinator.enabled=false
 bluetooth.profile.vcp.controller.enabled=false
+
+#
+# Modo de bajo consumo (FIX-042). El equipo tiene 814 MB utiles, asi que el
+# presupuesto de RAM es el recurso mas escaso: ro.low_ramdevice y
+# ro.config.low_ram hacen que A13 entre en modo de bajo consumo, con menos
+# servicios del sistema y limites de procesos en background mas agresivos.
+#
+# NOTA: no se toca el swap. El unico low-memory killer que funciona en este
+# kernel es el de Samsung (lmkd de A13 necesita PSI, y CONFIG_PSI no esta:
+# /proc/pressure/memory no existe), asi que quitar el swap dejaria al
+# sistema sin red de seguridad y una subida de memoria mataria procesos del
+# sistema en vez de apps.
+ro.low_ramdevice=true
+ro.config.low_ram=true
