@@ -92,8 +92,10 @@ Return<Status> Light::setLight(Type type, const LightState& state) {
     return Status::SUCCESS;
 }
 
-Return<void> Light::getSupportedTypes(Output<vec<Type>> types) {
-    types->push_back(Type::BACKLIGHT);
+Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
+    ::android::hardware::hidl_vec<Type> types;
+    types.push_back(Type::BACKLIGHT);
+    _hidl_cb(types);
     return Void();
 }
 

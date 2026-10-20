@@ -18,12 +18,22 @@
 
 #include <android/hardware/light/2.0/ILight.h>
 
+#include <hidl/Status.h>
+#include <hidl/types.h>
+
 namespace android::hardware::light::V2_0::implementation {
+
+using ::android::hardware::Return;
+using ::android::hardware::Void;
+using ::android::hardware::hidl_vec;
 
 class Light : public ILight {
   public:
     Return<Status> setLight(Type type, const LightState& state) override;
-    Return<void> getSupportedTypes(Output<vec<Type>> types) override;
+    // El .hal declara "getSupportedTypes() generates (vec<Type> types)", y el
+    // HIDL de A13 lo genera con la forma de callback (no con Output<>), que es
+    // lo que exige la interfaz pura virtual.
+    Return<void> getSupportedTypes(getSupportedTypes_cb _hidl_cb) override;
 };
 
 }  // namespace android::hardware::light::V2_0::implementation
