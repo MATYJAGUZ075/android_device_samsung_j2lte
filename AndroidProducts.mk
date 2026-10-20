@@ -16,8 +16,13 @@
 
 LOCAL_PATH := device/samsung/j2lte
 
+# Un .mk por cada lunch choice: el core de Android exige que cada producto
+# listado en COMMON_LUNCH_CHOICES tenga su propio fichero, si no se queja con
+# "COMMON_LUNCH_CHOICES contains products(s) not defined in this file".
 PRODUCT_MAKEFILES := \
-    $(LOCAL_PATH)/lineage_j2lte.mk
+    $(LOCAL_PATH)/lineage_j2lte.mk \
+    $(LOCAL_PATH)/lineage_j2ltedd.mk \
+    $(LOCAL_PATH)/lineage_j2ltedx.mk
 
 # Los tres modelos del J2: j2lte (LTE), j2ltedd y j2ltedx (dual SIM).
 # Mismo device tree, mismo vendor y mismo kernel; cambia TARGET_DEVICE, que
