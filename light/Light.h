@@ -18,23 +18,26 @@
 
 #include <android/hardware/light/2.0/ILight.h>
 
+#include <hidl/HidlSupport.h>
 #include <hidl/MQDescriptor.h>
 #include <hidl/Status.h>
-#include <hidl/String.h>
-#include <hidl/Vec.h>
 #include <map>
 
 namespace android::hardware::light::V2_0::implementation {
 
+// En A13 los tipos HIDL (hidl_vec, hidl_string, hidl_handle) viven en
+// android::hardware dentro de <hidl/HidlSupport.h>. No existen los headers
+// <hidl/Vec.h> ni <hidl/String.h> (en A11 si), por eso el include de
+// arriba y no esos.
+using ::android::hardware::hidl_handle;
+using ::android::hardware::hidl_string;
+using ::android::hardware::hidl_vec;
 using ::android::hardware::light::V2_0::ILight;
 using ::android::hardware::light::V2_0::LightState;
 using ::android::hardware::light::V2_0::Status;
 using ::android::hardware::light::V2_0::Type;
 using ::android::hardware::Return;
 using ::android::hardware::Void;
-using ::android::hidl::hidl_handle;
-using ::android::hidl::hidl_string;
-using ::android::hidl::hidl_vec;
 
 class Light : public ILight {
   public:

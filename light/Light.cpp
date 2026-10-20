@@ -93,9 +93,16 @@ Return<Status> Light::setLight(Type type, const LightState& state) {
 }
 
 Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
-    hidl_vec<Type> types;
-    types.push_back(Type::BACKLIGHT);
-    _hidl_cb(types);
+    // En A13 hidl_vec no tiene push_back(): se rellena un array y se pasa
+    // con setToExternal, igual que hace la implementacion de referencia.
+    Type *types = new Type[1];
+    types[0] = Type::BACKLIGHT;
+    {
+        hidl_vec<Type> hidl_types{};
+        hidl_types.setToExternal(types, 1);
+        _hidl_cb(hidl_types);
+    }
+    delete[] types;
     return Void();
 }
 
