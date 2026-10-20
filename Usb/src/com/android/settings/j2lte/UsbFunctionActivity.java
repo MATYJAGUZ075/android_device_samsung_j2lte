@@ -24,7 +24,9 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -64,9 +66,21 @@ public class UsbFunctionActivity extends Activity {
     private static final String EXTRA_USB_FUNCTION = "usb_function";
     private static final String EXTRA_USB_LABEL = "usb_label";
 
+    private static final int REQ_POST_NOTIFICATIONS = 42;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // A13 exige POST_NOTIFICATIONS para publicar la notificacion de "USB
+        // conectado". Es un permiso en tiempo de ejecucion: se pide la primera
+        // vez que se abre la app.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {android.Manifest.permission.POST_NOTIFICATIONS},
+                    REQ_POST_NOTIFICATIONS);
+        }
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
