@@ -18,16 +18,29 @@
 
 #include <android/hardware/light/2.0/ILight.h>
 
-#include <hidl/Status.h>
 #include <hidl/MQDescriptor.h>
+#include <hidl/Status.h>
+#include <hidl/String.h>
+#include <hidl/Vec.h>
 #include <map>
 
 namespace android::hardware::light::V2_0::implementation {
 
+using ::android::hardware::light::V2_0::ILight;
+using ::android::hardware::light::V2_0::LightState;
+using ::android::hardware::light::V2_0::Status;
+using ::android::hardware::light::V2_0::Type;
+using ::android::hardware::Return;
+using ::android::hardware::Void;
+using ::android::hidl::hidl_handle;
+using ::android::hidl::hidl_string;
+using ::android::hidl::hidl_vec;
+
 class Light : public ILight {
   public:
     Return<Status> setLight(Type type, const LightState& state) override;
-    Return<void> getSupportedTypes(Output<vec<Type>> types) override;
+    Return<void> getSupportedTypes(getSupportedTypes_cb _hidl_cb) override;
+    Return<void> debug(const hidl_handle& handle, const hidl_vec<hidl_string>& options) override;
 };
 
 }  // namespace android::hardware::light::V2_0::implementation
