@@ -144,30 +144,30 @@ $(call inherit-product, vendor/samsung/j2lte/j2lte-vendor.mk)
 PRODUCT_PACKAGES += \
     android.hardware.light@2.0-service.samsung
 
-# Panel de "Optimizaciones" (app de sistema) + overlay de gestos.
+# Utilidad USB (app de sistema) + overlay de gestos.
 #
-# El equipo tiene 814 MB utiles, asi que la RAM es el recurso mas escaso. El
-# panel deja a mano los ajustes de rendimiento que de otro modo solo se tocan
-# en Opciones de desarrollador, y que hay que cambiar cada vez que el equipo
-# se nota lento. Es platform-signed y privileged porque escribe en
-# Settings.Global.
+# El panel de "Optimizaciones" ya NO esta aqui: vive dentro de la propia app de
+# Ajustes (Ajustes -> Sistema -> Optimizaciones), implementado con un parche
+# sobre packages/apps/Settings. Esta app solo deja cambiar la funcion USB
+# (MTP / PTP / ADB / solo carga) y avisa con una notificacion al conectar el
+# cable, algo que A13 ya no ofrece.
 #
 # El modo de navegacion NO esta aqui: es el ajuste nativo de Ajustes
 # (Ajustes -> Sistema -> Gestos) y se deja donde estaba. Lo que se hace es
 # habilitar el overlay de gestos (no estatico, el default sigue siendo 3
 # botones) para que ese ajuste nativo pueda activarlo y configurarlo.
 PRODUCT_PACKAGES += \
-    j2lte-optimizations
+    j2lte-usb
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/Optimizations/privapp-permissions-j2lte-optimizations.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-optimizations.xml \
-    $(LOCAL_PATH)/Optimizations/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc
+    $(LOCAL_PATH)/Usb/privapp-permissions-j2lte-usb.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-usb.xml \
+    $(LOCAL_PATH)/init/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc
 
 # Tema de negro puro (RRO sobre framework-res y sobre el launcher).
 #
 # En A13 el fondo del tema oscuro es #121212 y con el color dinamico el tono
 # depende del wallpaper. Estos RRO lo pasan a negro puro. No son estaticos:
-# se habilitan desde el init (Optimizations/pure-black.rc) y se pueden apagar
+# se habilitan desde el init (PureBlack/pure-black.rc) y se pueden apagar
 # con "cmd overlay disable" sin rehacer la build.
 PRODUCT_PACKAGES += \
     j2lte-pure-black-framework \
@@ -187,7 +187,7 @@ PRODUCT_COPY_FILES += \
 # particion como respaldo. Si el kernel no tuviera CONFIG_ZRAM, los writes y el
 # swapon fallan con un aviso de init y el boot continua igual.
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/Optimizations/zram.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-zram.rc
+    $(LOCAL_PATH)/init/zram.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-zram.rc
 
 # Daemon MTP de Samsung (ya esta en el vendor como /vendor/bin/mtpd).
 #
@@ -196,7 +196,7 @@ PRODUCT_COPY_FILES += \
 # MTP por el socket /dev/socket/mtp. Sin el servicio, la funcion mtp del
 # gadget no sirve nada.
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/Optimizations/usb-mtp.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-mtpd.rc
+    $(LOCAL_PATH)/init/usb-mtp.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-mtpd.rc
 
 # Ajuste termico de la CPU: techo de 897 MHz y governor interactive con
 # valores conservadores.

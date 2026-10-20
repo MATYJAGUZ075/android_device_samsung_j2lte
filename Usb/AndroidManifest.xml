@@ -2,17 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.settings.j2lte">
 
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.MANAGE_USB" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Necesario para escribir sys.usb.config (lo consume el init del device tree). -->
+    <uses-permission android:name="android.permission.SET_PROPERTY" />
 
     <application
         android:label="@string/app_name"
         android:icon="@android:drawable/ic_menu_preferences"
         android:allowBackup="false">
         <activity
-            android:name=".OptimizationsActivity"
+            android:name=".UsbFunctionActivity"
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>
@@ -24,7 +23,7 @@
 
         <!-- Aviso de "USB conectado" con las funciones disponibles. -->
         <receiver
-            android:name=".OptimizationsActivity$UsbStateReceiver"
+            android:name=".UsbFunctionActivity$UsbStateReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_STATE" />
@@ -33,7 +32,7 @@
 
         <!-- Accion de la notificacion: cambia la funcion USB. -->
         <receiver
-            android:name=".OptimizationsActivity$UsbActionReceiver"
+            android:name=".UsbFunctionActivity$UsbActionReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.android.settings.j2lte.SET_USB_FUNCTION" />

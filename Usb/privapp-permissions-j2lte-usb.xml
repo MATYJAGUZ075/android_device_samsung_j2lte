@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <permissions>
     <privapp-permissions package="com.android.settings.j2lte">
-        <permission name="android.permission.WRITE_SECURE_SETTINGS" />
-        <permission name="android.permission.WRITE_SETTINGS" />
+        <permission name="android.permission.SET_PROPERTY" />
     </privapp-permissions>
 </permissions>
