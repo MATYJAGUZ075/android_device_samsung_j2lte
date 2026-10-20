@@ -148,3 +148,22 @@ PRODUCT_COPY_FILES += \
 # del panel ya expone whose rango es 0..max_brightness (355 en este equipo).
 PRODUCT_PACKAGES += \
     android.hardware.light@2.0-service.samsung
+
+# Panel de "Optimizaciones" (app de sistema) + overlay de gestos.
+#
+# El equipo tiene 814 MB utiles, asi que la RAM es el recurso mas escaso. El
+# panel deja a mano los ajustes de rendimiento que de otro modo solo se tocan
+# en Opciones de desarrollador, y que hay que cambiar cada vez que el equipo
+# se nota lento. Es platform-signed y privileged porque escribe en
+# Settings.Global.
+#
+# El modo de navegacion NO esta aqui: es el ajuste nativo de Ajustes
+# (Ajustes -> Sistema -> Gestos) y se deja donde estaba. Lo que se hace es
+# habilitar el overlay de gestos (no estatico, el default sigue siendo 3
+# botones) para que ese ajuste nativo pueda activarlo y configurarlo.
+PRODUCT_PACKAGES += \
+    j2lte-optimizations
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/Optimizations/privapp-permissions-j2lte-optimizations.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-optimizations.xml \
+    $(LOCAL_PATH)/Optimizations/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc

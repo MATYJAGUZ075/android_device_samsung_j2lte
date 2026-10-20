@@ -1,0 +1,16 @@
+// Panel de "Optimizaciones" para el J2.
+//
+// Es una app de sistema (platform-signed, privileged) porque necesita
+// WRITE_SECURE_SETTINGS para escribir en Settings.Global / Settings.System.
+//
+// La UI se construye en codigo (LinearLayout + Switch + Spinner) para no
+// depender de androidx ni de layouts复杂: compila con el SDK normal.
+android_app {
+    name: "j2lte-optimizations",
+    srcs: ["src/com/android/settings/j2lte/OptimizationsActivity.java"],
+    resource_dirs: ["res"],
+    manifest: "AndroidManifest.xml",
+    sdk_version: "current",
+    privileged: true,
+    certificate: "platform",
+}
