@@ -47,11 +47,6 @@ dalvik.vm.heapsize=192m
 dalvik.vm.heaptargetutilization=0.5
 dalvik.vm.heapminfree=1m
 dalvik.vm.heapmaxfree=2m
-dalvik.vm.dex2oat-Xmx=192m
-dalvik.vm.dex2oat-Xms=32m
-dalvik.vm.image-dex2oat-Xmx=32m
-dalvik.vm.image-dex2oat-Xms=32m
-dalvik.vm.dexopt.secondary=false
 
 # Radio (blob libsec-ril.so / módem tss310)
 telephony.lteOnCdmaDevice=0
