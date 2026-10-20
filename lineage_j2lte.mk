@@ -29,8 +29,15 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/product_launched_with_l_mr1.mk
 $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 
 # Set those variables here to overwrite the inherited values.
-PRODUCT_NAME := lineage_j2lte
-PRODUCT_DEVICE := j2lte
+# Los tres modelos del J2 (j2lte LTE, j2ltedd y j2ltedx dual SIM) comparten
+# el mismo SoC, el mismo device tree y el mismo vendor, asi que el producto se
+# parametriza por TARGET_DEVICE en vez de estar fijado a j2lte.
+#
+# ro.product.model lo ajusta libinit_j2lte en el arranque segun la variante de
+# hardware (J200F/G/GU/M/BT/Y), asi que PRODUCT_MODEL se deja como el del
+# modelo base.
+PRODUCT_NAME := lineage_$(TARGET_DEVICE)
+PRODUCT_DEVICE := $(TARGET_DEVICE)
 PRODUCT_MODEL := SM-J200M
 PRODUCT_BRAND := samsung
 PRODUCT_MANUFACTURER := samsung
@@ -54,4 +61,4 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     PRODUCT_NAME=j2ltejv \
     PRIVATE_BUILD_DESC="j2ltejv-user 13 TQ3A.230901.001 userdebug test-keys"
 
-BUILD_FINGERPRINT := lineage/j2lte/j2lte:13/TQ3A.230901.001/20260926:userdebug/test-keys
+BUILD_FINGERPRINT := lineage/$(TARGET_DEVICE)/$(TARGET_DEVICE):13/TQ3A.230901.001/20260926:userdebug/test-keys

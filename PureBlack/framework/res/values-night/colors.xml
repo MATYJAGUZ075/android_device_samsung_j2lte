@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Negro puro en vez del #121212 de A13. -->
+    <color name="colorBackground">#000000</color>
+    <color name="background_material_dark">#000000</color>
+    <color name="colorBackgroundFloating">#000000</color>
+</resources>

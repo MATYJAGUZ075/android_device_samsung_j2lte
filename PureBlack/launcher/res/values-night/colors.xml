@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo del launcher en negro puro. -->
+    <color name="workspace_background">#000000</color>
+    <color name="workspace_color_background">#000000</color>
+</resources>

@@ -1,0 +1,12 @@
+# Habilitar el tema de negro puro (RRO no estatico).
+#
+# En A13 el fondo del tema oscuro es #121212 y con el color dinamico el tono
+# depende del wallpaper. Con estos RRO el fondo pasa a negro puro, que es lo
+# que se veia antes en la linea 19/20 y en un panel TN de 240 ppi se nota.
+#
+# No es estatico a proposito: si molesta, se desactiva con
+#   cmd overlay disable com.android.j2lte.pureblack
+# sin necesidad de rehacer la build.
+on property:sys.boot_completed=1
+    exec -- /system/bin/cmd overlay enable com.android.j2lte.pureblack
+    exec -- /system/bin/cmd overlay enable com.android.j2lte.pureblack.launcher

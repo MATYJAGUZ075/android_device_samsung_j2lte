@@ -167,3 +167,16 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/Optimizations/privapp-permissions-j2lte-optimizations.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-optimizations.xml \
     $(LOCAL_PATH)/Optimizations/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc
+
+# Tema de negro puro (RRO sobre framework-res y sobre el launcher).
+#
+# En A13 el fondo del tema oscuro es #121212 y con el color dinamico el tono
+# depende del wallpaper. Estos RRO lo pasan a negro puro. No son estaticos:
+# se habilitan desde el init (Optimizations/pure-black.rc) y se pueden apagar
+# con "cmd overlay disable" sin rehacer la build.
+PRODUCT_PACKAGES += \
+    j2lte-pure-black-framework \
+    j2lte-pure-black-launcher
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/PureBlack/pure-black.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-pure-black.rc

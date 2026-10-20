@@ -19,7 +19,16 @@ LOCAL_PATH := device/samsung/j2lte
 PRODUCT_MAKEFILES := \
     $(LOCAL_PATH)/lineage_j2lte.mk
 
+# Los tres modelos del J2: j2lte (LTE), j2ltedd y j2ltedx (dual SIM).
+# Mismo device tree, mismo vendor y mismo kernel; cambia TARGET_DEVICE, que
+# el producto usa para el nombre, el fingerprint y ro.product.device.
 COMMON_LUNCH_CHOICES := \
     lineage_j2lte-user \
     lineage_j2lte-userdebug \
-    lineage_j2lte-eng
+    lineage_j2lte-eng \
+    lineage_j2ltedd-user \
+    lineage_j2ltedd-userdebug \
+    lineage_j2ltedd-eng \
+    lineage_j2ltedx-user \
+    lineage_j2ltedx-userdebug \
+    lineage_j2ltedx-eng
