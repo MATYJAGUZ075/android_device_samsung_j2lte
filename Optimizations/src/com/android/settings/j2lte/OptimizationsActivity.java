@@ -17,6 +17,7 @@
 package com.android.settings.j2lte;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -45,11 +46,14 @@ public class OptimizationsActivity extends Activity {
     private static final String[] ANIMATION_SCALES = {"0x", "0.5x", "1x", "2x", "5x", "10x"};
 
     private ContentResolver mResolver;
+    private ActivityManager mActivityManager;
+    private TextView mMemoryInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mResolver = getContentResolver();
+        mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -59,8 +63,11 @@ public class OptimizationsActivity extends Activity {
         root.addView(buildExtremeSwitch());
         root.addView(buildAnimationSpinner());
         root.addView(buildFinishActivitiesSwitch());
+        root.addView(buildMemoryInfo());
+        root.addView(buildTrimCachesButton());
 
         setContentView(root);
+        updateMemoryInfo();
     }
 
     private View buildExtremeSwitch() {
@@ -164,5 +171,67 @@ public class OptimizationsActivity extends Activity {
         applyScale(enabled ? 0 : 2);
         Settings.Global.putInt(mResolver, Settings.Global.ALWAYS_FINISH_ACTIVITIES,
                 enabled ? 1 : 0);
+    }
+
+    private View buildMemoryInfo() {
+        mMemoryInfo = new TextView(this);
+        mMemoryInfo.setPadding(0, 16, 0, 0);
+        return mMemoryInfo;
+    }
+
+    private void updateMemoryInfo() {
+        if (mMemoryInfo == null) return;
+        StringBuilder sb = new StringBuilder();
+        try {
+            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+            mActivityManager.getMemoryInfo(mi);
+            long total = mi.totalMem / (1024 * 1024);
+            long avail = mi.availMem / (1024 * 1024);
+            long used = (mi.totalMem - mi.availMem) / (1024 * 1024);
+            sb.append("RAM: ").append(used).append(" / ").append(total).append(" MB  (libre ")
+              .append(avail).append(" MB)");
+        } catch (Exception e) {
+            sb.append("RAM: no disponible");
+        }
+        try {
+            java.io.BufferedReader r = new java.io.BufferedReader(
+                    new java.io.FileReader("/proc/swaps"));
+            String line;
+            long swapTotal = 0;
+            long swapUsed = 0;
+            while ((line = r.readLine()) != null) {
+                String[] p = line.trim().split("\\s+");
+                if (p.length >= 4 && !line.startsWith("Filename")) {
+                    try {
+                        swapTotal += Long.parseLong(p[1]) * 1024;
+                        swapUsed += Long.parseLong(p[2]) * 1024;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+            r.close();
+            sb.append("\nSwap: ").append(swapUsed / (1024 * 1024)).append(" / ")
+              .append(swapTotal / (1024 * 1024)).append(" MB");
+        } catch (Exception e) {
+        }
+        mMemoryInfo.setText(sb.toString());
+    }
+
+    private View buildTrimCachesButton() {
+        Button b = new Button(this);
+        b.setText(R.string.opt_trim_caches);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Runtime.getRuntime().exec("cmd package trim-caches 0");
+                } catch (Exception e) {
+                    android.widget.Toast.makeText(OptimizationsActivity.this,
+                            "No se pudo limpiar la cache", android.widget.Toast.LENGTH_SHORT).show();
+                }
+                updateMemoryInfo();
+            }
+        });
+        return b;
     }
 }

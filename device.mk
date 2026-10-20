@@ -180,3 +180,16 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/PureBlack/pure-black.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-pure-black.rc
+
+# zram: swap comprimido en RAM (en vez de solo swap en particion).
+#
+# Con 814 MB de RAM utiles el unico swap disponible era vnswap0 (particion), y
+# llega a 328 MB usados: I/O a flash y desgaste. Con zram el swap vive en RAM
+# comprimida con LZ4, que es mucho mas rapido y no toca el flash.
+#
+# El driver esta en el kernel (drivers/staging/zram, CONFIG_ZRAM) y el init de
+# activacion va aqui: 256 MB de zram con prioridad 100, dejando el swap en
+# particion como respaldo. Si el kernel no tuviera CONFIG_ZRAM, los writes y el
+# swapon fallan con un aviso de init y el boot continua igual.
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/Optimizations/zram.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-zram.rc

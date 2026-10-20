@@ -7,4 +7,5 @@
     <string name="opt_animations_summary">Escala de las animaciones del sistema</string>
     <string name="opt_finish_activities">Destruir actividades al salir</string>
     <string name="opt_finish_activities_summary">Cierra cada actividad al salir en vez de dejarla en memoria</string>
+    <string name="opt_trim_caches">Limpiar la cache de las apps</string>
 </resources>
