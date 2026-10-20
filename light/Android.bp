@@ -55,8 +55,20 @@ cc_library_shared {
     ],
 }
 
+// El nombre lleva prefijo j2lte_ a proposito: la plataforma ya define un
+// cc_defaults llamado "light_service_defaults" en
+// hardware/interfaces/light/2.0/default/Android.bp, y en Soong los nombres de
+// modulo son globales al arbol. Con el mismo nombre el build abortaba:
+//
+//   FAILED: out/soong/build.ninja
+//   error: hardware/interfaces/light/2.0/default/Android.bp:42:1:
+//          module "light_service_defaults" already defined
+//   ninja: build stopped: subcommand failed.
+//
+// Ademas, sin el prefijo el cc_binary de abajo se habria enlazado con los
+// defaults de la plataforma en vez de los suyos.
 cc_defaults {
-    name: "light_service_defaults",
+    name: "j2lte_light_service_defaults",
     relative_install_path: "hw",
     defaults: ["hidl_defaults"],
     vendor: true,
@@ -73,7 +85,7 @@ cc_defaults {
 
 cc_binary {
     name: "android.hardware.light@2.0-service.samsung",
-    defaults: ["light_service_defaults"],
+    defaults: ["j2lte_light_service_defaults"],
     init_rc: ["android.hardware.light@2.0-service.rc"],
     srcs: ["service.cpp"],
     shared_libs: ["android.hardware.light@2.0-impl.samsung"],
