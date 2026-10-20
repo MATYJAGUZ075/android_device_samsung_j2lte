@@ -202,3 +202,13 @@ PRODUCT_COPY_FILES += \
 # gadget no sirve nada.
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/Optimizations/usb-mtp.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-mtpd.rc
+
+# Ajuste termico de la CPU: techo de 897 MHz y governor interactive con
+# valores conservadores.
+#
+# El Exynos 3475 con cooling pasivo se recalienta mucho (mas de 70 grados) y
+# el PMIC acaba reiniciando el equipo por proteccion termica. Con el techo a
+# 897 MHz la temperatura se queda entre 55 y 62 grados.
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/Thermal/j2lte-thermal-tune.sh:$(TARGET_COPY_OUT_VENDOR)/bin/j2lte-thermal-tune \
+    $(LOCAL_PATH)/Thermal/j2lte-thermal.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-thermal.rc

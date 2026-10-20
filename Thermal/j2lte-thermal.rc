@@ -1,0 +1,9 @@
+# Ajuste termico de la CPU.
+#
+# Se ejecuta en post-fs-data (los CPUs ya estan online) y otra vez al
+# terminar el boot, por si el init del vendor toca el governor despues.
+on post-fs-data
+    exec -- /system/bin/sh /vendor/bin/j2lte-thermal-tune
+
+on property:sys.boot_completed=1
+    exec -- /system/bin/sh /vendor/bin/j2lte-thermal-tune
