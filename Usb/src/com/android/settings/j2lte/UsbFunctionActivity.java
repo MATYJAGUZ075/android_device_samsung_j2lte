@@ -25,7 +25,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.usb.UsbManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -100,8 +99,10 @@ public class UsbFunctionActivity extends Activity {
         label.setText(R.string.opt_usb_function);
         box.addView(label);
 
-        Spinner spinner = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, USB_LABELS);
-        spinner.setAdapter(spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, USB_LABELS);
+        Spinner spinner = new Spinner(this);
+        spinner.setAdapter(adapter);
         box.addView(spinner);
 
         Button apply = new Button(this);
@@ -144,7 +145,10 @@ public class UsbFunctionActivity extends Activity {
     public static class UsbStateReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean connected = intent.getBooleanExtra(UsbManager.EXTRA_CONNECTED, false);
+            // "connected" es el extra del broadcast USB_STATE. En A13 el
+            // UsbManager.EXTRA_CONNECTED es @hide, asi que no se puede usar
+            // desde una app compilada contra el SDK publico.
+            boolean connected = intent.getBooleanExtra("connected", false);
             NotificationManager nm =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm == null) return;
