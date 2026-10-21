@@ -112,13 +112,3 @@ Return<void> Light::debug(const hidl_handle& /*handle*/,
 }
 
 }  // namespace android::hardware::light::V2_0::implementation
-
-namespace android::hardware::light::V2_0::implementation {
-
-// Punto de entrada del passthrough: el servicio android.hardware.light@2.0-service
-// lo busca con este simbolo.
-ILight* HIDL_FETCH_ILight(const char* /* name */) {
-    return new Light();
-}
-
-}  // namespace android::hardware::light::V2_0::implementation

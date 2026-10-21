@@ -39,11 +39,28 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-cc_library_shared {
-    name: "android.hardware.light@2.0-impl.samsung",
+// La implementacion se compila como libreria estatica y se linka DENTRO del
+// binario del servicio, no como una .so separada.
+//
+// Con cc_library_shared la .so acababa en /vendor/lib/hw/ y el servicio
+// muria al arrancar:
+//
+//   F/linker: CANNOT LINK EXECUTABLE
+//     "/vendor/bin/hw/android.hardware.light@2.0-service.samsung":
+//     library "android.hardware.light@2.0-impl.samsung.so" not found:
+//     needed by main executable
+//
+// El linker de los binarios de vendor busca en /vendor/lib, no en
+// /vendor/lib/hw/ (esa carpeta solo existe para las .so de los HAL del
+// fabricante, que se linkan dentro de su binario: en el mismo vendor,
+// android.hardware.keymaster@3.0-service no lista su impl como DT_NEEDED).
+// Ademas la plataforma hace lo mismo con relative_install_path "hw" en
+// hardware/interfaces/light/2.0/default/Android.bp, pero alli la .so la
+// carga el servicio "default" por dlopen, no por DT_NEEDED.
+cc_library_static {
+    name: "j2lte_light_impl",
     defaults: ["hidl_defaults"],
     vendor: true,
-    relative_install_path: "hw",
     srcs: ["Light.cpp"],
 
     shared_libs: [
@@ -88,5 +105,5 @@ cc_binary {
     defaults: ["j2lte_light_service_defaults"],
     init_rc: ["android.hardware.light@2.0-service.rc"],
     srcs: ["service.cpp"],
-    shared_libs: ["android.hardware.light@2.0-impl.samsung"],
+    static_libs: ["j2lte_light_impl"],
 }
