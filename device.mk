@@ -208,18 +208,12 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/Thermal/j2lte-thermal-tune.sh:$(TARGET_COPY_OUT_VENDOR)/bin/j2lte-thermal-tune \
     $(LOCAL_PATH)/Thermal/j2lte-thermal.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-thermal.rc
 
-# Ajustes de ART para el equipo (1 GB de RAM).
+# Ajustes de ART: el heap por app va en system.prop y los limites del
+# compilador de dex se ajustan en runtime (init/j2lte-art.rc).
 #
-# El limite de 512 MB del compilador de dex (dex2oat) baja a 192m para no
-# tirar de 512 MB de RAM durante el arranque, y se quita el segundo pase de
-# dexopt (que consume CPU y bateria sin necesidad).
-#
-# Van como PRODUCT_PROPERTY_OVERRIDES y no en system.prop porque A13 ya
-# define estas props y tenerlas en los dos sitios hace fallar el build con
-# "found duplicate sysprop assignments".
-PRODUCT_PROPERTY_OVERRIDES += \
-    dalvik.vm.dex2oat-Xmx=192m \
-    dalvik.vm.dex2oat-Xms=32m \
-    dalvik.vm.image-dex2oat-Xmx=32m \
-    dalvik.vm.image-dex2oat-Xms=32m \
-    dalvik.vm.dexopt.secondary=false
+# Las props del compilador de dex (dalvik.vm.dex2oat-Xmx y las demas) NO se
+# pueden tocar en A13 en tiempo de build: la plataforma ya las define y
+# ponerlas en system.prop o como PRODUCT_PROPERTY_OVERRIDES hace fallar el
+# build al generar build.prop con "found duplicate sysprop assignments".
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/init/j2lte-art.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-art.rc

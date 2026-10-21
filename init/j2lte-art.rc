@@ -1,0 +1,17 @@
+# Ajustes de ART en runtime.
+#
+# A13 define estas props en la plataforma y no deja tocarlas en la build
+# (si se ponen en system.prop o como PRODUCT_PROPERTY_OVERRIDES, el build
+# falla con "found duplicate sysprop assignments"). Se ajustan aqui, en
+# runtime, que es donde las lee el runtime de ART.
+#
+# El equipo tiene 1 GB de RAM (814 MB utiles), asi que el limite de 512 MB
+# del compilador de dex (dex2oat) se baja a 192m para no tirar de la mitad
+# de la memoria en el arranque, y se quita el segundo pase de dexopt (que
+# consume CPU y bateria a cambio de nada).
+on post-fs-data
+    setprop dalvik.vm.dex2oat-Xmx 192m
+    setprop dalvik.vm.dex2oat-Xms 32m
+    setprop dalvik.vm.image-dex2oat-Xmx 32m
+    setprop dalvik.vm.image-dex2oat-Xms 32m
+    setprop dalvik.vm.dexopt.secondary false
