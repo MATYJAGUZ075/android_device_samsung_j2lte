@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Permisos privilegiados que Ajustes necesita y no estan en el allowlist
+    de la plataforma (privapp-permissions-platform.xml).
+
+    SET_PROCESS_LIMIT lo necesita el panel "Optimizaciones" del J2
+    (Ajustes -> Sistema -> Optimizaciones) para el limite de procesos en
+    segundo plano. El permiso es signature|privileged, y Ajustes es una app
+    privilegiada (/system_ext/priv-app/Settings), asi que sin esta entrada el
+    system_server aborta al arrancar:
+
+      E AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: main
+      E AndroidRuntime: java.lang.IllegalStateException: Signature|privileged
+        permissions not in privapp-permissions allowlist:
+        {com.android.settings (/system/system_ext/priv-app/Settings):
+        android.permission.SET_PROCESS_LIMIT}
+
+    Se copia a /product/privapp-permissions/, igual que el de la app USB.
+-->
+<permissions>
+    <privapp-permissions package="com.android.settings">
+        <permission name="android.permission.SET_PROCESS_LIMIT" />
+    </privapp-permissions>
+</permissions>

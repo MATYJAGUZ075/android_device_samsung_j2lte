@@ -161,6 +161,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/Usb/privapp-permissions-j2lte-usb.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-usb.xml \
+    $(LOCAL_PATH)/privapp-permissions-j2lte-settings.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-settings.xml \
     $(LOCAL_PATH)/init/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc
 
 # Tema de negro puro (RRO sobre framework-res y sobre el launcher).
