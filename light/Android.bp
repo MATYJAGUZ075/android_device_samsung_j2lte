@@ -39,26 +39,25 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
-// La implementacion se compila como libreria estatica y se linka DENTRO del
-// binario del servicio, no como una .so separada.
+// La implementacion es una libreria compartida aparte, como en la plataforma
+// (hardware/interfaces/light/2.0/default/Android.bp).
 //
-// Con cc_library_shared la .so acababa en /vendor/lib/hw/ y el servicio
-// muria al arrancar:
+// La diferencia es donde se instala. La plataforma la deja en
+// /vendor/lib/hw/ porque el servicio "default" la carga por dlopen y el
+// linker tiene /vendor/${LIB}/hw entre las rutas permitidas. Aqui el
+// servicio es el nuestro y la carga el passthrough, que la busca por
+// nombre en las rutas de busqueda, y esas son /vendor/${LIB} (la raiz de
+// lib) sin el subdirectorio hw. Con la .so en hw/ el servicio no
+// arrancaba:
 //
 //   F/linker: CANNOT LINK EXECUTABLE
 //     "/vendor/bin/hw/android.hardware.light@2.0-service.samsung":
 //     library "android.hardware.light@2.0-impl.samsung.so" not found:
 //     needed by main executable
 //
-// El linker de los binarios de vendor busca en /vendor/lib, no en
-// /vendor/lib/hw/ (esa carpeta solo existe para las .so de los HAL del
-// fabricante, que se linkan dentro de su binario: en el mismo vendor,
-// android.hardware.keymaster@3.0-service no lista su impl como DT_NEEDED).
-// Ademas la plataforma hace lo mismo con relative_install_path "hw" en
-// hardware/interfaces/light/2.0/default/Android.bp, pero alli la .so la
-// carga el servicio "default" por dlopen, no por DT_NEEDED.
-cc_library_static {
-    name: "j2lte_light_impl",
+// Asi que va a /vendor/lib/ (sin relative_install_path).
+cc_library_shared {
+    name: "android.hardware.light@2.0-impl.samsung",
     defaults: ["hidl_defaults"],
     vendor: true,
     srcs: ["Light.cpp"],
@@ -105,5 +104,8 @@ cc_binary {
     defaults: ["j2lte_light_service_defaults"],
     init_rc: ["android.hardware.light@2.0-service.rc"],
     srcs: ["service.cpp"],
-    static_libs: ["j2lte_light_impl"],
+    // La implementacion NO se lista aqui: el passthrough la carga por dlopen
+    // (con el simbolo HIDL_FETCH_ILight), igual que hace la plataforma.
+    // Si se listara como shared_lib, el binario la pediria por DT_NEEDED y
+    // el linker no la encontraria en /vendor/lib/hw/.
 }

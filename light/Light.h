@@ -47,3 +47,19 @@ class Light : public ILight {
 };
 
 }  // namespace android::hardware::light::V2_0::implementation
+
+// Punto de entrada del passthrough.
+//
+// El simbolo tiene que estar FUERA del namespace y con extern "C", que es como
+// lo declara la plataforma (hardware/interfaces/light/2.0/default/Light.h).
+// Si se define dentro del namespace, el nombre exportado queda mangled
+// (_ZN7android8hardware5light4V2_014implementation17HIDL_FETCH_ILightEPKc) y el
+// passthrough, que lo busca con dlsym por el nombre plano, no lo encuentra:
+//
+//   E HidlServiceManagement: Passthrough lookup opened
+//     android.hardware.light@2.0-impl.samsung.so but could not find symbol
+//     HIDL_FETCH_ILight: undefined symbol: HIDL_FETCH_ILight. Keeping library
+//     open.
+//   E LegacySupport: Could not get passthrough implementation for
+//     android.hardware.light@2.0::ILight/default.
+extern "C" android::hardware::light::V2_0::ILight* HIDL_FETCH_ILight(const char* /* name */);

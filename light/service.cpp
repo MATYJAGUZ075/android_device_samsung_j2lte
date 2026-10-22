@@ -17,33 +17,28 @@
 #define LOG_TAG "android.hardware.light@2.0-service.samsung"
 
 #include <android/hardware/light/2.0/ILight.h>
-#include <hidl/HidlTransportSupport.h>
 
-#include "Light.h"
+#include <hidl/LegacySupport.h>
 
-using android::hardware::configureRpcThreadpool;
-using android::hardware::joinRpcThreadpool;
+using android::hardware::defaultPassthroughServiceImplementation;
 using android::hardware::light::V2_0::ILight;
-using android::hardware::light::V2_0::implementation::Light;
-using android::sp;
-using android::status_t;
-using android::OK;
 
 int main() {
-    // Se registra la implementacion propia directamente.
+    // El passthrough busca el simbolo HIDL_FETCH_ILight en la libreria
+    // android.hardware.light@2.0-impl.samsung.so, que es la que implementa
+    // el brillo sobre el sysfs del panel (Light.cpp).
     //
-    // Antes se usaba defaultPassthroughServiceImplementation<ILight>(), que
-    // delega en el HAL legacy del vendor. Pero en lineage-20 ese servicio
-    // legacy no existe (hardware/samsung no tiene el directorio lights) y el
-    // passthrough solo busca el "default service", asi que no habia nada que
-    // delegar. La clase Light de este mismo arbol (Light.cpp) es la que
-    // escribe el brillo en el sysfs del panel, asi que se registra ella misma.
-    configureRpcThreadpool(1, true);
-
-    sp<ILight> light = new Light;
-    status_t status = light->registerAsService();
-    LOG_ALWAYS_FATAL_IF(status != OK, "No se pudo registrar ILight/default");
-
-    joinRpcThreadpool();
-    return 0;
+    // Ojo: el simbolo tiene que estar declarado FUERA del namespace y con
+    // extern "C", si no el passthrough no lo encuentra por dlsym:
+    //
+    //   E HidlServiceManagement: Passthrough lookup opened
+    //     android.hardware.light@2.0-impl.samsung.so but could not find symbol
+    //     HIDL_FETCH_ILight: undefined symbol: HIDL_FETCH_ILight.
+    //   E LegacySupport: Could not get passthrough implementation for
+    //     android.hardware.light@2.0::ILight/default.
+    //
+    // Y el framework espera este servicio de forma sincrona (por ejemplo al
+    // arrancar el NotificationManagerService), asi que si el passthrough falla
+    // el boot se queda colgado ahi.
+    return defaultPassthroughServiceImplementation<ILight>();
 }

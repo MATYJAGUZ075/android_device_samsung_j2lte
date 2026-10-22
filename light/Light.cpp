@@ -107,8 +107,17 @@ Return<void> Light::getSupportedTypes(getSupportedTypes_cb _hidl_cb) {
 }
 
 Return<void> Light::debug(const hidl_handle& /*handle*/,
-                           const hidl_vec<hidl_string>& /*options*/) {
+                           const hidl_vec<hidl_string> &/*options*/) {
     return Void();
 }
 
 }  // namespace android::hardware::light::V2_0::implementation
+
+// Punto de entrada del passthrough.
+//
+// Va fuera del namespace y con extern "C" (ver el comentario en Light.h): el
+// passthrough lo busca con dlsym por el nombre plano "HIDL_FETCH_ILight".
+extern "C" android::hardware::light::V2_0::ILight* HIDL_FETCH_ILight(const char* /* name */) {
+    return new android::hardware::light::V2_0::implementation::Light();
+}
+
