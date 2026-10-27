@@ -1,23 +1,9 @@
-# Overlay de navegacion por gestos (NO estatico: se puede volver a 3 botones).
-#
-# El default del equipo sigue siendo 3 botones: navigation_mode=0 y el overlay
-# navbar.threebutton habilitado. Lo que se hace aqui es dejar disponible el
-# overlay de gestos para que la opcion NATIVA de Ajustes pueda activarlo y
-# configurarlo (Ajustes -> Sistema -> Gestos).
-#
-# Medido en el telefono con este arbol:
-#
-#   $ cmd overlay list | grep navbar
-#   [ ] com.android.internal.systemui.navbar.gestural_wide_back
-#   [x] com.android.internal.systemui.navbar.threebutton
-#   [ ] com.android.internal.systemui.navbar.twobutton
-#
-#   $ dumpsys package com.android.settings | grep Gesture
-#   e70258c com.android.settings/.Settings$GestureNavigationSettingsActivity
-#   (la pantalla nativa de configuracion de gestos ya existe)
-#
-# No se fuerza el modo: solo se habilita el overlay. Con ahi el SystemUI puede
-# aplicar el modo que marque navigation_mode, y el usuario puede volver a 3
-# botones cuando quiera.
+# Navegacion por botones fisicos por defecto.
+# Mantener disponible el overlay gestual para poder cambiar desde Ajustes > Gestos.
 on property:sys.boot_completed=1
-    exec -- /system/bin/cmd overlay enable com.android.internal.systemui.navbar.gestural_wide_back
+    exec -- /system/bin/cmd overlay enable com.android.internal.systemui.navbar.threebutton
+    exec -- /system/bin/cmd overlay disable com.android.internal.systemui.navbar.gestural_wide_back
+    exec -- /system/bin/cmd overlay disable com.android.internal.systemui.navbar.gestural_extra_wide_back
+    exec -- /system/bin/cmd overlay disable com.android.internal.systemui.navbar.gestural
+    exec -- /system/bin/cmd overlay disable com.android.internal.systemui.navbar.gestural_narrow_back
+    exec -- /system/bin/settings put secure navigation_mode 0

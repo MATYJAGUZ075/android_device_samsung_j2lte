@@ -152,15 +152,10 @@ PRODUCT_PACKAGES += \
 # (MTP / PTP / ADB / solo carga) y avisa con una notificacion al conectar el
 # cable, algo que A13 ya no ofrece.
 #
-# El modo de navegacion NO esta aqui: es el ajuste nativo de Ajustes
-# (Ajustes -> Sistema -> Gestos) y se deja donde estaba. Lo que se hace es
-# habilitar el overlay de gestos (no estatico, el default sigue siendo 3
-# botones) para que ese ajuste nativo pueda activarlo y configurarlo.
+# Navegacion por botones fisicos por defecto. Se puede cambiar a gestos desde Ajustes > Gestos.
 PRODUCT_PACKAGES += \
-    j2lte-usb
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/Usb/privapp-permissions-j2lte-usb.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-usb.xml \
     $(LOCAL_PATH)/privapp-permissions-j2lte-settings.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-settings.xml \
     $(LOCAL_PATH)/init/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc
 
