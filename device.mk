@@ -158,6 +158,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/privapp-permissions-j2lte-settings.xml:$(TARGET_COPY_OUT_PRODUCT)/privapp-permissions/j2lte-settings.xml \
     $(LOCAL_PATH)/init/j2lte-gesture-nav.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-gesture-nav.rc
+    $(LOCAL_PATH)/init/j2lte-lockscreen-reset.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/j2lte-lockscreen-reset.rc
 
 # Tema de negro puro (RRO sobre framework-res y sobre el launcher).
 #
