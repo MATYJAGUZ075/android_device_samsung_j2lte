@@ -47,6 +47,7 @@ TARGET_SCREEN_WIDTH := 540
 # Bluetooth
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
+    $(LOCAL_PATH)/bluetooth/bluetooth_a2dp_fix.conf:system/etc/bluetooth/bluetooth_a2dp_fix.conf
 
 # HAL BT HIDL 1.0 custom (impl vive en universal3475-common/hardware/bluetooth).
 # Enfoque validado por el porte Exynos7420 en LOS 20/21 (HIDL 1.0 sigue vivo).
