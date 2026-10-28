@@ -1,0 +1,24 @@
+# USB File Transfer configuration
+# Ensures MTP daemon serves file transfer mode when selected
+# Without this, default may be MTP or charging only
+
+service mtpd /vendor/bin/mtpd
+    class core
+    user system
+    group system mtp
+
+    # Wait for USB gadget to be ready
+    waitFor property sys.usb.state
+
+    # Set MTP config when USB is selected
+    on property sys.usb.state mtp
+        setprop sys.usb.config mtp
+
+    on property sys.usb.state mtp,adb
+        setprop sys.usb.config mtp,adb
+
+    on property sys.usb.state adb
+        setprop sys.usb.config adb
+
+    on property sys.usb.state charging
+        setprop sys.usb.config none
