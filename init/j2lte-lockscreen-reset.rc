@@ -1,6 +1,0 @@
-# Reset lockscreen credentials en boot para evitar credenciales corruptas.
-# Esto borra las bases de datos locksettings y spblob para forzar que el sistema
-# cree unas nuevas al iniciar, permitiendo al usuario configurar PIN/patrón nuevo.
-on property:sys.boot_completed=1
-    exec -- /system/bin/sh -c "rm -rf /data/system/locksettings.db* /data/system_de/0/locksettings.db* /data/system_de/0/spblob/* 2>/dev/null; sync; setprop lockscreen.disabled 0"
-description: Lockscreen credentials reset en boot
