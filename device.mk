@@ -45,9 +45,9 @@ TARGET_SCREEN_HEIGHT := 960
 TARGET_SCREEN_WIDTH := 540
 
 # Bluetooth
+# bt_vendor.conf lo lee el HAL de Bluetooth del vendor.
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
-    $(LOCAL_PATH)/bluetooth/bluetooth_a2dp_fix.conf:system/etc/bluetooth/bluetooth_a2dp_fix.conf
+    $(LOCAL_PATH)/bluetooth/bt_vendor.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/bluetooth/bt_vendor.conf
 
 # HAL BT HIDL 1.0 custom (impl vive en universal3475-common/hardware/bluetooth).
 # Enfoque validado por el porte Exynos7420 en LOS 20/21 (HIDL 1.0 sigue vivo).
