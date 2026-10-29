@@ -57,14 +57,6 @@ PRODUCT_PACKAGES += \
 # Camera
 # Wrapper legacy (CameraWrapper.cpp en common) contra camera.provider HIDL.
 # TODO(fase 3): evaluar subida de provider 2.4 -> 2.5 (instancia legacy/0,
-# como hace universal7420-common).
-#
-# App de cámara: el HAL es v1 y en Android 13 el framework NO expone la API
-# camera2 sobre un HAL v1 (CameraService::makeClient devuelve
-# ERROR_DEPRECATED_HAL), por lo que Aperture (camera2) no puede abrir la
-# cámara. Se usa el port de LineageOS Snap (camera1) que se integra desde
-# j2lte-build (packages/apps/Snap) y se desactiva la app camera2 de Lineage.
-PRODUCT_NO_CAMERA := true
 PRODUCT_PACKAGES += \
     camera.universal3475
 
